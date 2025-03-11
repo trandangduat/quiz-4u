@@ -1,10 +1,17 @@
 "use client"
 
 import React, { useRef, useState } from "react";
+import { getDocumentsSummary } from "./actions";
+
+type PresignedUrl = {
+  fileName: string;
+  url: string;
+};
 
 export default function Home() {
   const filesRef = useRef<HTMLInputElement>(null);
   const [filesName, setFilesName] = useState<string[]>([]);
+  const [filesType, setFilesType] = useState<string[]>([]);
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
     if (!filesRef.current || !filesRef.current.files) {
@@ -12,19 +19,73 @@ export default function Home() {
       return;
     }
     let files: FileList = filesRef.current.files;
+    console.log(files)
     let newFilesName: string[] = [];
+    let newFilesType: string[] = [];
     for (let i = 0; i < files.length; i++) {
       newFilesName.push(files[i].name);
+      newFilesType.push(files[i].type);
     }
     setFilesName(newFilesName);
+    setFilesType(newFilesType);
+  }
+
+  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
+    e.preventDefault();
+
+    if (!filesRef.current || !filesRef.current.files) {
+      console.log("No files were chosen.");
+      return;
+    }
+    let res = await fetch("/api/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        filesName: filesName,
+        filesType: filesType
+      })
+    });
+
+
+    // TODO: add error handler
+
+    let presignedUrls: PresignedUrl[] = await res.json();
+
+    let files: File[] = Array.from(filesRef.current.files);
+
+    for (let i = 0; i < presignedUrls.length; i++) {
+      let { fileName, url } = presignedUrls[i];
+      let file: File | undefined = files.find(f => f.name === fileName);
+      if (file) {
+        try {
+          let res = await fetch(url, {
+            method: "PUT",
+            headers: {
+              "Content-Type": file.type,
+            },
+            body: file,
+          });
+          // console.log(`${file.name} URL: ${url}`);
+        } catch (error) {
+          console.log("Failed to put objects in S3! ", error);
+        }
+        
+      }
+    }
+
   }
 
   return (
     <>
-      <form>
+      <form 
+        className="p-4 m-10 border-1"
+        onSubmit={handleFilesSubmit}
+      >
         <input 
           type="file"
-          ref={ filesRef }
+          ref={filesRef}
           multiple
           onChange={handleInputChange}
           accept="
@@ -40,6 +101,7 @@ export default function Home() {
             text/rtf
           "
         />
+        <button type="submit" className="bg-zinc-800 p-2 hover:bg-zinc-900">Go</button>
       </form>
       <div>
         {filesName.length > 0 && (

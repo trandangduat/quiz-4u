@@ -1,0 +1,44 @@
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+const s3: S3Client = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
+  },
+});
+
+export async function POST(req: Request) {
+    let { filesName, filesType } = await req.json();
+    console.log("🤫🤫🤫🤫🤫")
+    console.log(filesName)
+    console.log(filesType)
+
+    let commands: PutObjectCommand[] = [];
+
+    for (let i = 0; i < filesName.length; i++) {
+        commands.push(new PutObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: filesName[i],
+            ContentType: filesType[i]
+        }));
+    }
+
+    try {
+        const urls = await Promise.all(
+            commands.map(async (cmd: PutObjectCommand, index) => {
+                return {
+                    fileName: filesName[index],
+                    url: await getSignedUrl(s3, cmd, { expiresIn: 60 }) 
+                };
+            }
+        ));
+        return Response.json(urls);
+    } catch (e) {
+        console.log("Err creating presigned URL(s): ", e);
+        return Response.json({
+            msg: "Error creating presigned URL(s)."
+        });
+    }
+}
