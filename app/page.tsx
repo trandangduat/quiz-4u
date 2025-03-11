@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useRef, useState } from "react";
-import { getDocumentsSummary } from "./actions";
 
 type PresignedUrl = {
   fileName: string;
@@ -29,14 +28,8 @@ export default function Home() {
     setFilesName(newFilesName);
     setFilesType(newFilesType);
   }
-
-  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
-    e.preventDefault();
-
-    if (!filesRef.current || !filesRef.current.files) {
-      console.log("No files were chosen.");
-      return;
-    }
+  
+  async function getS3PresignedUrls(): Promise<PresignedUrl[]> {
     let res = await fetch("/api/", {
       method: "POST",
       headers: {
@@ -47,34 +40,41 @@ export default function Home() {
         filesType: filesType
       })
     });
+    // TODO: error handling when res not return urls 
+    return await res.json();
+  }
 
+  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
+    e.preventDefault();
 
-    // TODO: add error handler
-
-    let presignedUrls: PresignedUrl[] = await res.json();
-
-    let files: File[] = Array.from(filesRef.current.files);
-
-    for (let i = 0; i < presignedUrls.length; i++) {
-      let { fileName, url } = presignedUrls[i];
-      let file: File | undefined = files.find(f => f.name === fileName);
-      if (file) {
-        try {
-          let res = await fetch(url, {
-            method: "PUT",
-            headers: {
-              "Content-Type": file.type,
-            },
-            body: file,
-          });
-          // console.log(`${file.name} URL: ${url}`);
-        } catch (error) {
-          console.log("Failed to put objects in S3! ", error);
-        }
-        
-      }
+    if (!filesRef.current || !filesRef.current.files) {
+      console.log("No files were chosen.");
+      return;
     }
 
+    let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
+    let files: File[] = Array.from(filesRef.current.files);
+
+    const uploadPromises = presignedUrls.map(async ({ fileName, url }) => {
+      const file: File | undefined = files.find(f => f.name === fileName);
+      if (!file) {
+        console.error(`No file with name ${fileName} was found.`);
+        return Promise.resolve();
+      }
+      try {
+        return await fetch(url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": file.type,
+          },
+          body: file,
+        });
+      } catch (error) {
+        console.error(`Failed to upload ${fileName}: `, error);
+      }
+    });
+
+    await Promise.all(uploadPromises);
   }
 
   return (
