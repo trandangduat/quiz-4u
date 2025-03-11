@@ -30,7 +30,7 @@ export default function Home() {
   }
   
   async function getS3PresignedUrls(): Promise<PresignedUrl[]> {
-    let res = await fetch("/api/", {
+    let res = await fetch("/api/get-s3-presigned-urls", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
