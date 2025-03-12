@@ -30,18 +30,25 @@ export default function Home() {
   }
   
   async function getS3PresignedUrls(): Promise<PresignedUrl[]> {
-    let res = await fetch("/api/get-s3-presigned-urls", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        filesName: filesName,
-        filesType: filesType
-      })
-    });
-    // TODO: error handling when res not return urls 
-    return await res.json();
+    try {
+      let res = await fetch("/api/get-s3-presigned-urls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filesName: filesName,
+          filesType: filesType
+        })
+      });
+      if (!res.ok) {
+        throw new Error((await res.json()).error);
+      }
+      return await res.json();
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
   }
 
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{

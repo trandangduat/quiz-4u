@@ -1,5 +1,6 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { NextResponse } from "next/server";
 
 const s3: S3Client = new S3Client({
   region: process.env.AWS_REGION!,
@@ -32,13 +33,16 @@ export async function POST(req: Request) {
                     fileName: filesName[index],
                     url: await getSignedUrl(s3, cmd, { expiresIn: 60 }) 
                 };
-            }
-        ));
-        return Response.json(urls);
+            })
+        );
+        return NextResponse.json(urls);
     } catch (e) {
-        console.log("Err creating presigned URL(s): ", e);
-        return Response.json({
-            msg: "Error creating presigned URL(s)."
+        console.log("💔💔💔💔")
+        console.error(e);
+        return NextResponse.json({
+            error: "Error happened while getting pre-signed urls."
+        }, {
+            status: 500
         });
     }
 }
