@@ -38,7 +38,8 @@ export default function Home() {
         },
         body: JSON.stringify({
           filesName: filesName,
-          filesType: filesType
+          filesType: filesType,
+          typeOperation: "put"
         })
       });
       if (!res.ok) {
@@ -51,15 +52,11 @@ export default function Home() {
     }
   }
 
-  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
-    e.preventDefault();
-
+  async function uploadFilesToS3(presignedUrls: PresignedUrl[]) {
     if (!filesRef.current || !filesRef.current.files) {
       console.log("No files were chosen.");
       return;
     }
-
-    let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
     let files: File[] = Array.from(filesRef.current.files);
 
     const uploadPromises = presignedUrls.map(async ({ fileName, url }) => {
@@ -82,6 +79,39 @@ export default function Home() {
     });
 
     await Promise.all(uploadPromises);
+  }
+
+  async function getFilesFromS3(filesName: string[]): Promise<PresignedUrl[]> {
+    try {
+      let res = await fetch("/api/get-s3-presigned-urls", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filesName: filesName,
+          typeOperation: "get"
+        }),
+      });
+      return await res.json();
+    } catch (error) {
+      console.log(`Failed to get files: ${error}`);
+      return [];
+    }
+  }
+
+  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
+    e.preventDefault();
+
+    let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
+    if (presignedUrls.length < 1) {
+      return;
+    }
+
+    await uploadFilesToS3(presignedUrls);
+    let urls: PresignedUrl[] = await getFilesFromS3(filesName);
+    console.log(urls.map(e => e.url));
+
   }
 
   return (
