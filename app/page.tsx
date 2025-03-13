@@ -2,7 +2,7 @@
 
 import { readStreamableValue } from "ai/rsc";
 import React, { useRef, useState } from "react";
-import ReactMarkdown from 'react-markdown';
+import Markdown from 'react-markdown';
 
 type PresignedUrl = {
   fileName: string;
@@ -118,7 +118,6 @@ export default function Home() {
       setGg(s => `${s}${text}`);
     }
 
-
     // setGg((await res.json()).text);
   }
 
@@ -156,7 +155,7 @@ export default function Home() {
         )}
       </div>
       <div className="bg-zinc-900 p-4 text-sm">
-        {gg}
+        <Markdown>{gg}</Markdown>
       </div>
     </>
   );
