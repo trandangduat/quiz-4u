@@ -11,32 +11,18 @@ export const s3: S3Client = new S3Client({
 });
 
 export async function POST(req: Request) {
-    const { filesName, filesType, typeOperation } = await req.json();
+    const { filesName, filesType } = await req.json();
     console.log("🤫🤫🤫🤫🤫");
     console.log(filesName);
-    if (typeOperation === "put") {
-        console.log(filesType);
-    }
     
     let commands = [];
     
-    if (typeOperation === "put") {
-        for (let i = 0; i < filesName.length; i++) {
-            commands.push(new PutObjectCommand({
-                Bucket: process.env.AWS_BUCKET_NAME!,
-                Key: filesName[i],
-                ContentType: filesType[i]
-            }));
-        }
-    } else if (typeOperation === "get") {
-        for (let i = 0; i < filesName.length; i++) {
-            commands.push(new GetObjectCommand({
-                Bucket: process.env.AWS_BUCKET_NAME!,
-                Key: filesName[i]
-            }));
-        }
-    } else {
-        return NextResponse.json({ error: "Invalid typeOperation" }, { status: 400 });
+    for (let i = 0; i < filesName.length; i++) {
+        commands.push(new PutObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME!,
+            Key: filesName[i],
+            ContentType: filesType[i]
+        }));
     }
     
     try {

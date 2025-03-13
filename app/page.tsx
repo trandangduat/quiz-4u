@@ -42,7 +42,6 @@ export default function Home() {
         body: JSON.stringify({
           filesName: filesName,
           filesType: filesType,
-          typeOperation: "put"
         })
       });
       if (!res.ok) {
@@ -92,9 +91,9 @@ export default function Home() {
       return;
     }
     
-    // console.time("upload");
-    // await uploadFilesToS3(presignedUrls);
-    // console.timeEnd("upload");
+    console.time("upload");
+    await uploadFilesToS3(presignedUrls);
+    console.timeEnd("upload");
 
     let res = await fetch("api/get-documents-summary", {
       method: "POST",
