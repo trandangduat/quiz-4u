@@ -1,6 +1,8 @@
 "use client"
 
+import { readStreamableValue } from "ai/rsc";
 import React, { useRef, useState } from "react";
+import ReactMarkdown from 'react-markdown';
 
 type PresignedUrl = {
   fileName: string;
@@ -11,6 +13,7 @@ export default function Home() {
   const filesRef = useRef<HTMLInputElement>(null);
   const [filesName, setFilesName] = useState<string[]>([]);
   const [filesType, setFilesType] = useState<string[]>([]);
+  const [gg, setGg] = useState<string>("");
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
     if (!filesRef.current || !filesRef.current.files) {
@@ -81,25 +84,6 @@ export default function Home() {
     await Promise.all(uploadPromises);
   }
 
-  async function getFilesFromS3(filesName: string[]): Promise<PresignedUrl[]> {
-    try {
-      let res = await fetch("/api/get-s3-presigned-urls", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          filesName: filesName,
-          typeOperation: "get"
-        }),
-      });
-      return await res.json();
-    } catch (error) {
-      console.log(`Failed to get files: ${error}`);
-      return [];
-    }
-  }
-
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
     e.preventDefault();
 
@@ -107,11 +91,36 @@ export default function Home() {
     if (presignedUrls.length < 1) {
       return;
     }
+    
+    // console.time("upload");
+    // await uploadFilesToS3(presignedUrls);
+    // console.timeEnd("upload");
 
-    await uploadFilesToS3(presignedUrls);
-    let urls: PresignedUrl[] = await getFilesFromS3(filesName);
-    console.log(urls.map(e => e.url));
+    let res = await fetch("api/get-documents-summary", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        filesName: filesName,
+        filesType: filesType
+      })
+    });
 
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader!.read();
+      if (done) {
+        break;
+      }
+      let text: string = decoder.decode(value, { stream: true });
+      setGg(s => `${s}${text}`);
+    }
+
+
+    // setGg((await res.json()).text);
   }
 
   return (
@@ -146,6 +155,9 @@ export default function Home() {
             <p key={name}>{name}</p>
           ))
         )}
+      </div>
+      <div className="bg-zinc-900 p-4 text-sm">
+        {gg}
       </div>
     </>
   );
