@@ -1,8 +1,6 @@
 "use client"
 
-import { readStreamableValue } from "ai/rsc";
 import React, { useRef, useState } from "react";
-import Markdown from 'react-markdown';
 
 type PresignedUrl = {
   fileName: string;
@@ -13,7 +11,7 @@ export default function Home() {
   const filesRef = useRef<HTMLInputElement>(null);
   const [filesName, setFilesName] = useState<string[]>([]);
   const [filesType, setFilesType] = useState<string[]>([]);
-  const [gg, setGg] = useState<string>("");
+  const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
     if (!filesRef.current || !filesRef.current.files) {
@@ -83,18 +81,7 @@ export default function Home() {
     await Promise.all(uploadPromises);
   }
 
-  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
-    e.preventDefault();
-
-    let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
-    if (presignedUrls.length < 1) {
-      return;
-    }
-    
-    console.time("upload");
-    await uploadFilesToS3(presignedUrls);
-    console.timeEnd("upload");
-
+  async function extractDocumentsKnowledge(filesName: string[], filesType: string[]): Promise<string> {
     let res = await fetch("api/get-documents-summary", {
       method: "POST",
       headers: {
@@ -108,6 +95,7 @@ export default function Home() {
 
     const reader = res.body?.getReader();
     const decoder = new TextDecoder();
+    let finalText: string = "";
 
     while (true) {
       const { done, value } = await reader!.read();
@@ -115,10 +103,27 @@ export default function Home() {
         break;
       }
       let text: string = decoder.decode(value, { stream: true });
-      setGg(s => `${s}${text}`);
+      setExtractingKnowledge(s => `${s}${text}`);
+      finalText += text;
     }
+    return finalText;
+  }
 
-    // setGg((await res.json()).text);
+  async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
+    e.preventDefault();
+
+    let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
+    if (presignedUrls.length < 1) {
+      return;
+    }
+    
+    console.time("upload");
+    await uploadFilesToS3(presignedUrls);
+    console.timeEnd("upload");
+
+    console.time("extract knowledge");
+    let knowledge: string = await extractDocumentsKnowledge(filesName, filesType);
+    console.timeEnd("extract knowledge");
   }
 
   return (
@@ -155,7 +160,7 @@ export default function Home() {
         )}
       </div>
       <div className="bg-zinc-900 p-4 text-sm">
-        <Markdown>{gg}</Markdown>
+        {extractingKnowledge}
       </div>
     </>
   );
