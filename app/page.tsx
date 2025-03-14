@@ -121,13 +121,32 @@ export default function Home() {
       return;
     }
     
-    console.time("upload");
-    await uploadFilesToS3(presignedUrls);
-    console.timeEnd("upload");
+    // console.time("upload");
+    // await uploadFilesToS3(presignedUrls);
+    // console.timeEnd("upload");
 
     console.time("extract knowledge");
     let knowledge: string = await extractDocumentsKnowledge(filesName, filesType);
     console.timeEnd("extract knowledge");
+
+    console.time("gen quiz");
+
+    let res = await fetch("/api/ai-generate-questions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        knowledge: knowledge,
+        numQuestions: 10,
+      }),
+    });
+    console.log(await res.json());
+
+    console.timeEnd("gen quiz");
+
+
+    
   }
 
   return (
