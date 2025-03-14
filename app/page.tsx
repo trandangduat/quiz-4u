@@ -82,7 +82,7 @@ export default function Home() {
   }
 
   async function extractDocumentsKnowledge(filesName: string[], filesType: string[]): Promise<string> {
-    let res = await fetch("api/get-documents-summary", {
+    let res = await fetch("api/ai-extract-knowledge", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,20 +93,24 @@ export default function Home() {
       })
     });
 
-    const reader = res.body?.getReader();
-    const decoder = new TextDecoder();
-    let finalText: string = "";
+    try {
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let finalText: string = "";
 
-    while (true) {
-      const { done, value } = await reader!.read();
-      if (done) {
-        break;
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) {
+          break;
+        }
+        let text: string = decoder.decode(value, { stream: true });
+        setExtractingKnowledge(s => `${s}${text}`);
+        finalText += text;
       }
-      let text: string = decoder.decode(value, { stream: true });
-      setExtractingKnowledge(s => `${s}${text}`);
-      finalText += text;
+      return finalText;
+    } catch (e) {
+      return `Something wrong happenned while streaming result: ${e}`;
     }
-    return finalText;
   }
 
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
