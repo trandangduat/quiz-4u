@@ -113,6 +113,20 @@ export default function Home() {
     }
   }
 
+  async function generateQuiz(knowledge: string, numQuestions: number) {
+    let res = await fetch("/api/ai-generate-questions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        knowledge,
+        numQuestions,
+      }),
+    });
+    return await res.json();
+  }
+
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
     e.preventDefault();
 
@@ -130,22 +144,9 @@ export default function Home() {
     console.timeEnd("extract knowledge");
 
     console.time("gen quiz");
-
-    let res = await fetch("/api/ai-generate-questions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        knowledge: knowledge,
-        numQuestions: 10,
-      }),
-    });
-    console.log(await res.json());
-
+    let quiz: any = await generateQuiz(knowledge, 10);
+    console.log(quiz);
     console.timeEnd("gen quiz");
-
-
     
   }
 
