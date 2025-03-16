@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useRef, useState } from "react";
+import { createQuiz } from "./action";
 
 type PresignedUrl = {
   fileName: string;
@@ -130,6 +131,20 @@ export default function Home() {
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
     e.preventDefault();
 
+    await createQuiz({
+      quizTitle: "heheh",
+      questions: [
+        {
+          question: "hh",
+          choices: ["a", "b", "c", "d"],
+          answer: 1,
+          explaination: "balalal"
+        }
+      ],
+    });
+
+    return;
+
     let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
     if (presignedUrls.length < 1) {
       return;
@@ -147,7 +162,8 @@ export default function Home() {
     let quiz: any = await generateQuiz(knowledge, 10);
     console.log(quiz);
     console.timeEnd("gen quiz");
-    
+
+    await createQuiz(quiz);
   }
 
   return (
