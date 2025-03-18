@@ -14,8 +14,18 @@ datasource db {
 }
 
 model Quiz {
-  id String @id @default(uuid())
-  title String @db.Text
-  content String @db.Text
-  createdAt DateTime @default(now())
+  id        String     @id @default(uuid())
+  title     String     @db.Text
+  questions Question[] // Mối quan hệ một-nhiều với Question
+  createdAt DateTime   @default(now())
+}
+
+model Question {
+  id          String   @id @default(uuid())
+  question    String   @db.Text
+  choices     String[] // Mảng các lựa chọn
+  answer      Int      // Chỉ số của câu trả lời đúng
+  explanation String   @db.Text
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
 }

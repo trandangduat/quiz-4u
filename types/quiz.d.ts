@@ -2,7 +2,7 @@ type QuizQuestion = {
     question: string;
     choices: string[];
     answer: number;
-    explaination: string;
+    explanation: string;
 };
 
 export type Quiz = {

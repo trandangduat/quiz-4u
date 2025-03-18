@@ -131,20 +131,6 @@ export default function Home() {
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void>{
     e.preventDefault();
 
-    await createQuiz({
-      quizTitle: "heheh",
-      questions: [
-        {
-          question: "hh",
-          choices: ["a", "b", "c", "d"],
-          answer: 1,
-          explaination: "balalal"
-        }
-      ],
-    });
-
-    return;
-
     let presignedUrls: PresignedUrl[] = await getS3PresignedUrls();
     if (presignedUrls.length < 1) {
       return;
@@ -163,7 +149,7 @@ export default function Home() {
     console.log(quiz);
     console.timeEnd("gen quiz");
 
-    await createQuiz(quiz);
+    let quizId: string = await createQuiz(quiz);
   }
 
   return (
