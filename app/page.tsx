@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { createQuiz } from "./action";
+import Link from "next/link";
 
 type PresignedUrl = {
   fileName: string;
@@ -12,6 +13,7 @@ export default function Home() {
   const filesRef = useRef<HTMLInputElement>(null);
   const [filesName, setFilesName] = useState<string[]>([]);
   const [filesType, setFilesType] = useState<string[]>([]);
+  const [quizLink, setQuizLink] = useState<string>("#");
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -145,11 +147,14 @@ export default function Home() {
     console.timeEnd("extract knowledge");
 
     console.time("gen quiz");
-    let quiz: any = await generateQuiz(knowledge, 10);
+    const { quiz } = await generateQuiz(knowledge, 10);
     console.log(quiz);
     console.timeEnd("gen quiz");
 
     let quizId: string = await createQuiz(quiz);
+    if (quizId != "Error") {
+      setQuizLink(`/quiz/${quizId}`);
+    }
   }
 
   return (
@@ -187,6 +192,9 @@ export default function Home() {
       </div>
       <div className="bg-zinc-900 p-4 text-sm">
         {extractingKnowledge}
+      </div>
+      <div>
+        <Link href={quizLink} className="text-blue-400 hover:underline">Go to quiz</Link>
       </div>
     </>
   );

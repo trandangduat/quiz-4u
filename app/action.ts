@@ -5,21 +5,27 @@ import { Quiz } from "@/types/quiz";
 
 export async function createQuiz(quiz: Quiz) {
     const { quizTitle, questions } = quiz;
-    const res = await prisma.quiz.create({
-        data: {
-            title: quizTitle,
-            questions: {
-                create: questions.map(q => ({
-                    question: q.question,
-                    choices: q.choices,
-                    answer: q.answer,
-                    explanation: q.explanation,
-                }))
+    try {
+        const res = await prisma.quiz.create({
+            data: {
+                title: quizTitle,
+                questions: {
+                    create: questions.map(q => ({
+                        question: q.question,
+                        choices: q.choices,
+                        answer: q.answer,
+                        explanation: q.explanation,
+                    }))
+                }
+            },
+            include: {
+                questions: true,
             }
-        },
-        include: {
-            questions: true,
-        }
-    });
-    return res.id;
+        });
+        console.log(res);
+        return res.id;
+    } catch (e) {
+        console.error(e);
+        return "Error";
+    }
 }
