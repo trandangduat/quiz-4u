@@ -3,6 +3,9 @@
 import React, { useRef, useState } from "react";
 import { createQuiz } from "./action";
 import Link from "next/link";
+import SignIn from "./components/sign-in";
+import { useSession } from "next-auth/react";
+import UserInfo from "./components/user-info";
 
 type PresignedUrl = {
   fileName: string;
@@ -15,6 +18,7 @@ export default function Home() {
   const [filesType, setFilesType] = useState<string[]>([]);
   const [quizLink, setQuizLink] = useState<string>("#");
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
+  const { data: session } = useSession();
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
     if (!filesRef.current || !filesRef.current.files) {
@@ -159,6 +163,11 @@ export default function Home() {
 
   return (
     <>
+      {session?.user ? 
+        <UserInfo username={session.user.name ?? "Unknown"} email={session.user.email ?? "Unknown"} />
+          : 
+        <SignIn />
+      }
       <form 
         className="p-4 m-10 border-1"
         onSubmit={handleFilesSubmit}
