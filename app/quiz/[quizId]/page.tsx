@@ -1,21 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { QuizQuestion } from "@/types/quiz";
-import { randomUUID } from "crypto";
 import { Suspense } from "react";
-
-function Question ({ Q } : { Q: QuizQuestion }) {
-    return (
-        <div>
-            <p className="font-bold">{Q.question}</p>
-            {Q.choices.map(choice => (
-                <div key={randomUUID()}>
-                    <p>{choice}</p>
-                </div>
-            ))}
-        </div>
-    );
-}
+import QuizForm from "../components/quiz-form";
 
 async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
     const { quizId } = await params;
@@ -41,11 +27,7 @@ async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
     return (
         <>
             <h1>{quiz?.title}</h1>
-            <div className="flex flex-col gap-8">
-                {quiz?.questions.map(Q => (
-                    <Question Q={Q} key={Q.id} />
-                ))}
-            </div>
+            <QuizForm quiz={quiz} />
         </>
     )
 }
