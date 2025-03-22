@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { QuizQuestion } from "@/types/quiz";
 import { randomUUID } from "crypto";
 import { Suspense } from "react";
