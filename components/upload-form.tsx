@@ -3,13 +3,14 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { createQuiz } from "../app/action";
+import { User } from "next-auth";
 
 type PresignedUrl = {
   fileName: string;
   url: string;
 };
 
-export default function UploadForm() {
+export default function UploadForm({ user } : { user: User }) {
   const filesRef = useRef<HTMLInputElement>(null);
   const [filesName, setFilesName] = useState<string[]>([]);
   const [filesType, setFilesType] = useState<string[]>([]);
@@ -120,7 +121,7 @@ export default function UploadForm() {
     const { quiz } = await generateQuiz(knowledge, 10);
     console.log(quiz);
     console.timeEnd("gen quiz");
-    let quizId = await createQuiz(quiz);
+    let quizId = await createQuiz(quiz, user.id!);
     if (quizId !== "Error") {
       setQuizLink(`/quiz/${quizId}`);
     }

@@ -1,11 +1,12 @@
-import NavBar from "../components/navbar";
+import { auth } from "@/lib/auth";
 import UploadForm from "../components/upload-form";
 
 export default async function Home() {
+  const session = await auth();
+
   return (
     <>
-      <NavBar />
-      <UploadForm />
+      <UploadForm user={session?.user!} />
     </>
   );
 }
