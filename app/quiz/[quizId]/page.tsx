@@ -1,3 +1,4 @@
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { QuizQuestion } from "@/types/quiz";
 import { randomUUID } from "crypto";
@@ -24,8 +25,18 @@ async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
         },
         include: {
             questions: true,
+            creator: true
         }
     });
+
+    const session = await auth();
+    if (session?.user?.id != quiz?.creatorId) {
+        return (
+            <>
+                <h1>This page is not public or not available.</h1>
+            </>
+        )
+    }
 
     return (
         <>
@@ -47,11 +58,9 @@ function QuizSkeleton() {
     )
 }
 
-export default function Page({ params } : { params: Promise<{ quizId: string }> }) {
-
+export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
     return (
         <>
-            <h1>Hello quiz</h1>
             <Suspense fallback={<QuizSkeleton />}>
                 <Quiz params={params} />
             </Suspense>
