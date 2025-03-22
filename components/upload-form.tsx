@@ -121,7 +121,7 @@ export default function UploadForm({ user } : { user: User }) {
     const { quiz } = await generateQuiz(knowledge, 10);
     console.log(quiz);
     console.timeEnd("gen quiz");
-    let quizId = await createQuiz(quiz, user.id!);
+    let quizId = await createQuiz(quiz, user.id!, knowledge);
     if (quizId !== "Error") {
       setQuizLink(`/quiz/${quizId}`);
     }

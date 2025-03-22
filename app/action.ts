@@ -3,30 +3,41 @@
 import { prisma } from "@/lib/prisma";
 import { Quiz } from "@/types/quiz";
 
-export async function createQuiz(quiz: Quiz, userId: string) {
-    console.log(userId);
+export async function createQuiz(quiz: Quiz, userId: string, knowledge: string) {
     const { quizTitle, questions } = quiz;
     try {
-        const res = await prisma.quiz.create({
+        const knowledgeEntry = await prisma.knowledge.create({
             data: {
-                title: quizTitle,
+                content: knowledge,
                 creatorId: userId,
-                questions: {
-                    create: questions.map(q => ({
-                        question: q.question,
-                        choices: q.choices,
-                        answer: q.answer,
-                        explanation: q.explanation,
-                    }))
-                },
+                quizzes: {
+                    create: {
+                        title: quizTitle,
+                        creatorId: userId,
+                        questions: {
+                            create: questions.map(q => ({
+                                question: q.question,
+                                choices: q.choices,
+                                answer: q.answer,
+                                explanation: q.explanation,
+                            }))
+                        }
+                    }
+                }
             },
             include: {
-                questions: true,
-                creator: true,
+                quizzes: {
+                    include: {
+                        questions: true,
+                        creator: true
+                    }
+                }
             }
         });
-        console.log(res);
-        return res.id;
+        
+        const createdQuiz = knowledgeEntry.quizzes[0];
+        console.log(createdQuiz);
+        return createdQuiz.id;
     } catch (e) {
         console.error(e);
         return "Error";

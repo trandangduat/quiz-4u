@@ -23,12 +23,13 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
-  quizzes       Quiz[]          // User can create multiple quizzes
- 
+  quizzes       Quiz[] // User can create multiple quizzes
+  knowledges    Knowledge[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
 model Account {
   userId            String
   type              String
@@ -41,33 +42,33 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@id([provider, providerAccountId])
 }
- 
+
 model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@id([identifier, token])
 }
- 
+
 // Optional for WebAuthn support
 model Authenticator {
   credentialID         String  @unique
@@ -78,27 +79,37 @@ model Authenticator {
   credentialDeviceType String
   credentialBackedUp   Boolean
   transports           String?
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@id([userId, credentialID])
 }
 
 model Quiz {
-  id        String     @id @default(uuid())
-  title     String     @db.Text
-  questions Question[] // Mối quan hệ một-nhiều với Question
-  createdAt DateTime   @default(now())
-  creatorId String?     
-  creator   User?       @relation(fields: [creatorId], references: [id])
+  id          String     @id @default(uuid())
+  title       String     @db.Text
+  questions   Question[] // Mối quan hệ một-nhiều với Question
+  createdAt   DateTime   @default(now())
+  creatorId   String?
+  creator     User?      @relation(fields: [creatorId], references: [id])
+  knowledgeId String?
+  knowledge   Knowledge? @relation(fields: [knowledgeId], references: [id])
 }
 
 model Question {
   id          String   @id @default(uuid())
   question    String   @db.Text
   choices     String[] // Mảng các lựa chọn
-  answer      Int      // Chỉ số của câu trả lời đúng
+  answer      Int // Chỉ số của câu trả lời đúng
   explanation String   @db.Text
   quizId      String
   quiz        Quiz     @relation(fields: [quizId], references: [id])
+}
+
+model Knowledge {
+  id        String   @id @default(uuid())
+  content   String
+  creatorId String?
+  creator   User?    @relation(fields: [creatorId], references: [id])
+  quizzes   Quiz[]   
 }
