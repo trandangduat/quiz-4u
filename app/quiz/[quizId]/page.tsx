@@ -10,7 +10,13 @@ async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
             id: quizId,
         },
         include: {
-            questions: true,
+            questions: {
+                select: {
+                    question: true,
+                    choices: true,
+                    id: true,
+                }
+            },
             creator: true
         }
     });
