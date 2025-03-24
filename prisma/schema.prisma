@@ -23,7 +23,7 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
-  quizzes       Quiz[] // User can create multiple quizzes
+  quizzes       Quiz[]
   knowledges    Knowledge[]
 
   createdAt DateTime @default(now())
@@ -52,7 +52,7 @@ model Account {
 }
 
 model Session {
-  sessionToken String   @unique
+  sessionToken String   @id
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
