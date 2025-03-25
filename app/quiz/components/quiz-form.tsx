@@ -1,6 +1,6 @@
 "use client"
 
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useState } from "react";
 import gradeUserChoices from "../[quizId]/action";
 
