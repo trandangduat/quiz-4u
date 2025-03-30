@@ -15,7 +15,7 @@ interface NavBarItemProps extends React.LiHTMLAttributes<HTMLLIElement> {
 
 function NavBarItem({ className, children, ...props }: NavBarItemProps) {
     return (
-        <li className={cn(className)} {...props}>
+        <li className={cn("relative", className)} {...props}>
             {children}
         </li>
     );
@@ -27,7 +27,7 @@ interface NavBarGroupProps extends React.HTMLAttributes<HTMLUListElement> {
 
 function NavBarGroup({ className, children, ...props }: NavBarGroupProps) {
     return (
-        <ul className={cn(className)} {...props}>
+        <ul className={cn("flex flex-row gap-2 items-center", className)} {...props}>
             {children}
         </ul>
     );
@@ -35,17 +35,26 @@ function NavBarGroup({ className, children, ...props }: NavBarGroupProps) {
 
 export default function NavBar() {
     return (
-        <nav className="flex flex-row gap-8 justify-center">
+        <nav className="flex flex-row justify-between p-4 text-sm font-bold items-center">
             <NavBarGroup>
                 {links.map((item) => (
                     <NavBarItem key={item.link}>
-                        <Link href={item.link}>{item.title}</Link>
+                        <Link 
+                            href={item.link} 
+                            className="px-3 py-2 rounded-md transition-colors text-slate-800 dark:text-slate-400 hover:bg-secondary/50 hover:text-slate-900 dark:hover:text-white"
+                        >
+                            {item.title}
+                        </Link>
                     </NavBarItem>
                 ))}
             </NavBarGroup>
             <NavBarGroup>
-                <ToggleThemeButton />
-                <UserInfo />
+                <NavBarItem>
+                    <ToggleThemeButton />
+                </NavBarItem>
+                <NavBarItem>
+                    <UserInfo />
+                </NavBarItem>
             </NavBarGroup>
         </nav>
     );
