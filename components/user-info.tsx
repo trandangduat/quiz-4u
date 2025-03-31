@@ -20,7 +20,7 @@ export default async function UserInfo({ className }: { className?: string }) {
                         <img src={session.user.image!} />
                     </div>
                 </DropdownTrigger>
-                <DropdownContent className="p-3">
+                <DropdownContent className="p-3 transition-transform duration-200 origin-top-right scale-100">
                     <div className="p-2 flex gap-4">
                         <div className="rounded-sm overflow-clip w-10 aspect-square">
                             <img src={session.user.image!} className="w-full h-full" />
