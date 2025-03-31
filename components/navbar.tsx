@@ -15,7 +15,7 @@ interface NavBarItemProps extends React.LiHTMLAttributes<HTMLLIElement> {
 
 function NavBarItem({ className, children, ...props }: NavBarItemProps) {
     return (
-        <li className={cn("relative", className)} {...props}>
+        <li className={cn("relative flex items-center", className)} {...props}>
             {children}
         </li>
     );
