@@ -57,7 +57,7 @@ export const DropdownContent = ({ children, className }: DropdownContentProps) =
   const { isOpen } = useDropdown();
   // if (!isOpen) return null;
   return (
-    <div className={cn("absolute mt-2 right-0 bg-background text-foreground border rounded-md", className, isOpen ? "scale-100" : "scale-0")}>
+    <div className={cn("absolute mt-2 right-0 bg-background text-foreground border rounded-md min-w-[200px] w-max", className, isOpen ? "scale-100" : "scale-0")}>
       {children}
     </div>
   );
