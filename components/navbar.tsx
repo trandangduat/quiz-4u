@@ -50,7 +50,9 @@ export default function NavBar() {
             </NavBarGroup>
             <NavBarGroup>
                 <NavBarItem>
-                    <ToggleThemeButton />
+                    <ToggleThemeButton 
+                        className="px-3 py-2 rounded-md cursor-pointer transition-colors text-slate-800 dark:text-slate-400 hover:bg-secondary/50 hover:text-slate-900 dark:hover:text-white"
+                    />
                 </NavBarItem>
                 <NavBarItem>
                     <UserInfo />
