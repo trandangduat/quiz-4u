@@ -132,6 +132,7 @@ export default function UploadForm({ user } : { user: User }) {
 
   return (
     <>
+    <div className="p-8 m-8 rounded-xl border-4 border-dashed border-secondary-200 bg-secondary-400/10">
       <form className="" onSubmit={handleFilesSubmit}>
         <FileInput
           type="file"
@@ -143,24 +144,26 @@ export default function UploadForm({ user } : { user: User }) {
         <Button
           type="submit"
           variant="default"
-          className="cursor-pointer"
+          className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
+          disabled={filesName.length < 1}
         >
           <Sparkles size={24} />
           Generating
         </Button>
       </form>
-      <div>
-        {filesName.length > 0 &&
-          filesName.map(name => <p key={name}>{name}</p>)}
-      </div>
-      <div className="bg-zinc-900 p-4 text-sm">
-        {extractingKnowledge}
-      </div>
-      <div>
-        <Link href={quizLink} className="text-blue-400 hover:underline">
-          Go to quiz
-        </Link>
-      </div>
+    </div>
+    <div>
+      {filesName.length > 0 &&
+        filesName.map(name => <p key={name}>{name}</p>)}
+    </div>
+    <div className="bg-zinc-900 p-4 text-sm">
+      {extractingKnowledge}
+    </div>
+    <div>
+      <Link href={quizLink} className="text-blue-400 hover:underline">
+        Go to quiz
+      </Link>
+    </div>
     </>
   );
 }

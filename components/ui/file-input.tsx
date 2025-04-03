@@ -1,5 +1,12 @@
 import { cn } from "@/lib/utils";
+import { Upload } from "lucide-react";
+import { Playfair_Display } from "next/font/google";
 import React from "react";
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
+  subsets: ["latin"],
+});
 
 type FileInputProps = {
   className?: string;
@@ -9,11 +16,11 @@ export const FileInput = ({ className, ...props }: FileInputProps & React.Compon
   return (
     <div
       className={cn(
-        "flex items-center justify-center w-full relative text-center",
+        "w-full relative text-center",
         className
       )}>
       <input
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0"
         type="file"
         accept={props.accept}
         multiple={props.multiple}
@@ -21,10 +28,24 @@ export const FileInput = ({ className, ...props }: FileInputProps & React.Compon
         ref={props.ref}
       />
       <div
-        className="w-full p-4 border-2 border-dashed rounded-2xl"
+        className="w-full flex flex-col justify-center items-center"
       >
-        <p className="text-2xl font-bold">Upload or drag <span className="text-primary-800">files</span> to start generating quiz</p>
+        <FileInputSymbol />
+        <p className={cn("text-3xl dark:text-slate-400 mt-6", playfairDisplay.className)}>
+          Upload or drag <span className="">documents</span> 
+        </p>
+        <p className="text-base dark:text-slate-400 mt-2">
+          to start generating quizzes
+        </p>
       </div>
     </div>
   );
+}
+
+const FileInputSymbol = () => {
+  return (
+    <div className="">
+      <Upload size={64} className="dark:text-slate-400" />
+    </div>
+  )
 }
