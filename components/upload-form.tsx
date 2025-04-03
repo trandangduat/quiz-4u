@@ -4,6 +4,9 @@ import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { createQuiz } from "../app/action";
 import { User } from "next-auth";
+import { FileInput } from "./ui/file-input";
+import { Button } from "./ui/button";
+import { Sparkles } from "lucide-react";
 
 type PresignedUrl = {
   fileName: string;
@@ -129,17 +132,22 @@ export default function UploadForm({ user } : { user: User }) {
 
   return (
     <>
-      <form className="p-4 m-10 border-1" onSubmit={handleFilesSubmit}>
-        <input
+      <form className="" onSubmit={handleFilesSubmit}>
+        <FileInput
           type="file"
           ref={filesRef}
           multiple
           onChange={handleInputChange}
           accept="application/pdf, application/x-javascript, text/javascript, application/x-python, text/x-python, text/plain, text/html, text/css, text/md, text/csv, text/xml, text/rtf"
         />
-        <button type="submit" className="bg-zinc-800 p-2 hover:bg-zinc-900">
-          Go
-        </button>
+        <Button
+          type="submit"
+          variant="default"
+          className="cursor-pointer"
+        >
+          <Sparkles size={24} />
+          Generating
+        </Button>
       </form>
       <div>
         {filesName.length > 0 &&
