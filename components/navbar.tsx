@@ -41,7 +41,7 @@ export default function NavBar() {
                     <NavBarItem key={item.link}>
                         <Link 
                             href={item.link} 
-                            className="px-3 py-2 rounded-md transition-colors text-slate-800 dark:text-slate-400 hover:bg-secondary/50 hover:text-slate-900 dark:hover:text-white"
+                            className="px-3 py-2 rounded-md transition-colors text-slate-800 dark:text-slate-300 hover:bg-secondary/50 hover:text-slate-900 dark:hover:text-white"
                         >
                             {item.title}
                         </Link>

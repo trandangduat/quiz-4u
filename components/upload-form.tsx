@@ -4,9 +4,9 @@ import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { createQuiz } from "../app/action";
 import { User } from "next-auth";
-import { FileInput } from "./ui/file-input";
+import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
-import { Sparkles } from "lucide-react";
+import { Files, Sparkles } from "lucide-react";
 
 type PresignedUrl = {
   fileName: string;
@@ -17,6 +17,7 @@ export default function UploadForm({ user } : { user: User }) {
   const filesRef = useRef<HTMLInputElement>(null);
   const [filesName, setFilesName] = useState<string[]>([]);
   const [filesType, setFilesType] = useState<string[]>([]);
+  const [filesSize, setFilesSize] = useState<number[]>([]);
   const [quizLink, setQuizLink] = useState<string>("#");
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
 
@@ -28,12 +29,15 @@ export default function UploadForm({ user } : { user: User }) {
     let files = filesRef.current.files;
     let newFilesName: string[] = [];
     let newFilesType: string[] = [];
+    let newFilesSize: number[] = [];
     for (let i = 0; i < files.length; i++) {
       newFilesName.push(files[i].name);
       newFilesType.push(files[i].type);
+      newFilesSize.push(files[i].size);
     }
     setFilesName(newFilesName);
     setFilesType(newFilesType);
+    setFilesSize(newFilesSize);
   }
 
   async function getS3PresignedUrls(): Promise<PresignedUrl[]> {
@@ -132,7 +136,7 @@ export default function UploadForm({ user } : { user: User }) {
 
   return (
     <>
-    <div className="p-8 m-8 rounded-xl border-4 border-dashed border-secondary-200 bg-secondary-400/10">
+    <div className="p-8 m-8 rounded-xl border-4 border-dashed dark:border-slate-800 bg-slate-700/10">
       <form className="" onSubmit={handleFilesSubmit}>
         <FileInput
           type="file"
@@ -141,22 +145,33 @@ export default function UploadForm({ user } : { user: User }) {
           onChange={handleInputChange}
           accept="application/pdf, application/x-javascript, text/javascript, application/x-python, text/x-python, text/plain, text/html, text/css, text/md, text/csv, text/xml, text/rtf"
         />
-        <Button
-          type="submit"
-          variant="default"
-          className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
-          disabled={filesName.length < 1}
-        >
-          <Sparkles size={24} />
-          Generating
-        </Button>
       </form>
+      <FileInputList
+        filesName={filesName}
+        filesType={filesType}
+        filesSize={filesSize}
+        className="mt-4"
+        hasFiles={filesName.length > 0}
+      />
+      {/* <div>
+        {filesName.length > 0 &&
+          filesName.map(name => <p key={name}>{name}</p>)}
+      </div> */}
+      <Button
+        type="submit"
+        variant="default"
+        className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
+        disabled={filesName.length < 1}
+      >
+        <Sparkles size={24} />
+        Generating
+      </Button>
     </div>
-    <div>
-      {filesName.length > 0 &&
-        filesName.map(name => <p key={name}>{name}</p>)}
-    </div>
-    <div className="bg-zinc-900 p-4 text-sm">
+
+
+
+
+    <div className="dark:bg-zinc-900 p-4 text-sm">
       {extractingKnowledge}
     </div>
     <div>
