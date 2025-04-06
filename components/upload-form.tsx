@@ -1,17 +1,21 @@
 "use client"
 
-import React, { useRef, useState } from "react";
+import React, { use, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createQuiz } from "../app/action";
 import { User } from "next-auth";
 import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
-import { Files, Sparkle } from "lucide-react";
+import { Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { set } from "zod";
 
 type PresignedUrl = {
   fileName: string;
   url: string;
 };
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default function UploadForm({ user } : { user: User }) {
   const filesRef = useRef<HTMLInputElement>(null);
@@ -20,6 +24,15 @@ export default function UploadForm({ user } : { user: User }) {
   const [filesSize, setFilesSize] = useState<number[]>([]);
   const [quizLink, setQuizLink] = useState<string>("#");
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
+  const [currentStage, setCurrentStage] = useState<string>("none"); //"none", "uploading", "extracting", "generating"
+  const uploadSectionRef = useRef<HTMLDivElement>(null);
+  const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
+  
+  useEffect(() => {
+    if (uploadSectionRef.current) {
+      setUploadSectionHeight(`${uploadSectionRef.current.scrollHeight}px`);
+    }
+  }, [filesName, currentStage]);
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
     if (!filesRef.current || !filesRef.current.files) {
@@ -116,11 +129,21 @@ export default function UploadForm({ user } : { user: User }) {
 
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
+    console.log("then second")
+
+    setCurrentStage("uploading");
+    await sleep(2000);
+    setCurrentStage("none");
+    return;
+
     let presignedUrls = await getS3PresignedUrls();
-    if (presignedUrls.length < 1) return;
+    if (presignedUrls.length < 1) {
+      return;
+    }
     console.time("upload files to s3");
-    await uploadFilesToS3(presignedUrls);
+    // await uploadFilesToS3(presignedUrls);
     console.timeEnd("upload files to s3");
+
     console.time("extract knowledge");
     let knowledge = await extractDocumentsKnowledge(filesName, filesType);
     console.timeEnd("extract knowledge");
@@ -137,31 +160,48 @@ export default function UploadForm({ user } : { user: User }) {
   return (
     <>
     <div className="p-8 m-8 rounded-xl border-2 border-dashed border-secondary/90 bg-linear-to-t from-secondary/30 to-primary-100/10">
-      <form className="" onSubmit={handleFilesSubmit}>
-        <FileInput
-          type="file"
-          ref={filesRef}
-          multiple
-          onChange={handleInputChange}
-          accept="application/pdf, application/x-javascript, text/javascript, application/x-python, text/x-python, text/plain, text/html, text/css, text/md, text/csv, text/xml, text/rtf"
-        />
+      <form onSubmit={handleFilesSubmit} >
+        <div 
+          ref={uploadSectionRef}
+          className={cn("overflow-clip transition-all duration-500", currentStage !== "none" ? "blur-xs" : "blur-none")}
+          style= {{
+            height: currentStage !== "none" ? 0 : uploadSectionHeight,
+          }}
+        >
+          <FileInput
+            type="file"
+            ref={filesRef}
+            multiple
+            onChange={handleInputChange}
+            accept="application/pdf, application/x-javascript, text/javascript, application/x-python, text/x-python, text/plain, text/html, text/css, text/md, text/csv, text/xml, text/rtf"
+          />
+          <FileInputList
+            filesName={filesName}
+            filesType={filesType}
+            filesSize={filesSize}
+            className="mt-4"
+            hasFiles={filesName.length > 0}
+          />
+        </div>
+        <Button
+          type="submit"
+          variant="default"
+          className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
+          disabled={filesName.length < 1 || currentStage !== "none"}
+        >
+          {currentStage !== "none" ? (
+            <>
+              <LoaderCircle size={24} className="animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkle size={24} />
+              Generate 
+            </>
+          )}
+        </Button>
       </form>
-      <FileInputList
-        filesName={filesName}
-        filesType={filesType}
-        filesSize={filesSize}
-        className="mt-4"
-        hasFiles={filesName.length > 0}
-      />
-      <Button
-        type="submit"
-        variant="default"
-        className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
-        disabled={filesName.length < 1}
-      >
-        <Sparkle size={24} />
-        Generate 
-      </Button>
     </div>
 
 
