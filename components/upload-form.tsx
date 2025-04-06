@@ -6,7 +6,7 @@ import { createQuiz } from "../app/action";
 import { User } from "next-auth";
 import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
-import { Files, Sparkles } from "lucide-react";
+import { Files, Sparkle } from "lucide-react";
 
 type PresignedUrl = {
   fileName: string;
@@ -136,7 +136,7 @@ export default function UploadForm({ user } : { user: User }) {
 
   return (
     <>
-    <div className="p-8 m-8 rounded-xl border-4 border-dashed dark:border-slate-800 bg-slate-700/10">
+    <div className="p-8 m-8 rounded-xl border-2 border-dashed border-secondary/90 bg-linear-to-t from-secondary/30 to-primary-100/10">
       <form className="" onSubmit={handleFilesSubmit}>
         <FileInput
           type="file"
@@ -153,18 +153,14 @@ export default function UploadForm({ user } : { user: User }) {
         className="mt-4"
         hasFiles={filesName.length > 0}
       />
-      {/* <div>
-        {filesName.length > 0 &&
-          filesName.map(name => <p key={name}>{name}</p>)}
-      </div> */}
       <Button
         type="submit"
         variant="default"
         className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
         disabled={filesName.length < 1}
       >
-        <Sparkles size={24} />
-        Generating
+        <Sparkle size={24} />
+        Generate 
       </Button>
     </div>
 

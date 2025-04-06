@@ -37,10 +37,10 @@ export const FileInput = ({ className, ...props }: FileInputProps & React.Compon
         className="w-full flex flex-col justify-center items-center"
       >
         <FileInputSymbol />
-        <p className={cn("text-3xl dark:text-slate-400 mt-6")}>
+        <p className={cn("text-2xl dark:text-primary-900 mt-6 font-semibold")}>
           Upload or drag <span className="">documents</span> 
         </p>
-        <p className={cn("text-base dark:text-slate-400 mt-2")}>
+        <p className={cn("text-sm dark:text-primary-900/70 mt-1")}>
           Maximum 5MB per file
         </p>
       </div>
@@ -51,7 +51,7 @@ export const FileInput = ({ className, ...props }: FileInputProps & React.Compon
 const FileInputSymbol = () => {
   return (
     <div className="">
-      <Upload size={64} className="dark:text-slate-400" />
+      <Upload size={64} className="dark:text-primary-900" />
     </div>
   )
 }
@@ -66,17 +66,19 @@ type FileInputListProps = {
 
 export const FileInputList = ({className, filesName, filesType, filesSize, hasFiles} : FileInputListProps) => {
   return (
-    <ul className = {cn("flex flex-col dark:bg-slate-800/20 rounded-xl p-6 space-y-3", className, hasFiles ? "" : "hidden")}>
-      {filesName!.map((name, index) => (
-        <li key={index} className={cn("flex items-center justify-between text-sm", geistMono.className)}>
-          <p className={cn("dark:text-slate-400")}>
-            {name.slice(0, 30) + (name.length > 30 ? "..." : "")}
-          </p>
-          <p className={cn("dark:text-slate-400")}>
-            {(filesSize![index] / 1024 / 1024).toFixed(2)} MB
-          </p>
-        </li>
-      ))}
-    </ul>
+    <div className="w-1/2 mx-auto">
+      <ul className = {cn("flex flex-col bg-primary-500/10 dark:bg-slate-800/20 rounded-xl p-6 space-y-3", className, hasFiles ? "" : "hidden")}>
+        {filesName!.map((name, index) => (
+          <li key={index} className={cn("flex items-center justify-between text-sm", geistMono.className)}>
+            <p className={cn("dark:text-slate-400")}>
+              {name.slice(0, 30) + (name.length > 30 ? "..." : "")}
+            </p>
+            <p className={cn("dark:text-slate-400")}>
+              {(filesSize![index] / 1024 / 1024).toFixed(2)} MB
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
