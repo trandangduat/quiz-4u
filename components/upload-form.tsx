@@ -8,7 +8,7 @@ import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
 import { Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { set } from "zod";
+import ShimmerText from "./ui/shimmer-text";
 
 type PresignedUrl = {
   fileName: string;
@@ -202,6 +202,21 @@ export default function UploadForm({ user } : { user: User }) {
           )}
         </Button>
       </form>
+
+      <div className="mt-8 px-4">
+        <div>
+          <p className="flex items-center gap-2 mt-4 font-semibold">
+            {/* <LoaderCircle size={18} className="animate-spin" /> */}
+            <ShimmerText text="Uploading files" shimmerWidth={100} />
+          </p>
+        </div>
+        <div className="flex items-center gap-2 mt-4 font-semibold">
+          <ShimmerText text="Extracting knowledge" shimmerWidth={100} />
+        </div>
+        <div className="flex items-center gap-2 mt-4 font-semibold">
+          <ShimmerText text="Generating quiz" shimmerWidth={100} />
+        </div>
+      </div>
     </div>
 
 

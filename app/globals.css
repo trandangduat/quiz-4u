@@ -2,6 +2,18 @@
 @import "tw-animate-css";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --animate-shiny-text: shiny-text var(--shimmer-duration) linear infinite;
+  @keyframes shimmer-text {
+    0% {
+      background-position: calc(-100% - var(--shimmer-width)) 0;
+    }
+    100% {
+      background-position: calc(100% + var(--shimmer-width)) 0;
+    }
+  }
+
+}
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
