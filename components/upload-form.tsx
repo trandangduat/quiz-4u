@@ -186,7 +186,7 @@ export default function UploadForm({ user } : { user: User }) {
         <Button
           type="submit"
           variant="default"
-          className="cursor-pointer w-full mt-8 text-lg py-6 font-semibold"
+          className={cn("cursor-pointer w-full text-lg py-6 font-semibold", currentStage !== "none" ? "mt-0" : "mt-8")}
           disabled={filesName.length < 1 || currentStage !== "none"}
         >
           {currentStage !== "none" ? (
