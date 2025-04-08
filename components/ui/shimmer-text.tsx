@@ -8,7 +8,7 @@ type ShimmerTextProps = {
   className?: string;
 }
 
-const ShimmerText = ({text, shimmerWidth = 100, shimmerDuration = 2000,  className} : ShimmerTextProps) => {
+const ShimmerText = ({text, shimmerWidth = 100, shimmerDuration = 2000, className} : ShimmerTextProps) => {
   return (
     <span 
         style={{
@@ -16,7 +16,7 @@ const ShimmerText = ({text, shimmerWidth = 100, shimmerDuration = 2000,  classNa
             "--shimmer-duration": `${shimmerDuration}ms`,
         } as React.CSSProperties}
         className={cn(
-            "inline-block text-secondary-600/50", 
+            "inline-block text-secondary-600/60", 
             "bg-clip-text bg-no-repeat bg-gradient-to-r from-transparent via-secondary-900 to-transparent",
             `animate-[shimmer-text_var(--shimmer-duration)_linear_infinite] [background-position:0_0] [background-size:var(--shimmer-width)_100%]`,
             className

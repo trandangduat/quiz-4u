@@ -6,7 +6,7 @@ import { createQuiz } from "../app/action";
 import { User } from "next-auth";
 import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
-import { Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-react";
+import { Check, Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
 
@@ -24,7 +24,7 @@ export default function UploadForm({ user } : { user: User }) {
   const [filesSize, setFilesSize] = useState<number[]>([]);
   const [quizLink, setQuizLink] = useState<string>("#");
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
-  const [currentStage, setCurrentStage] = useState<string>("none"); //"none", "uploading", "extracting", "generating"
+  const [currentStage, setCurrentStage] = useState<number>(0); //"none", "uploading", "extracting", "generating"
   const uploadSectionRef = useRef<HTMLDivElement>(null);
   const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
   
@@ -131,9 +131,13 @@ export default function UploadForm({ user } : { user: User }) {
     e.preventDefault();
     console.log("then second")
 
-    setCurrentStage("uploading");
+    setCurrentStage(1);
     await sleep(2000);
-    setCurrentStage("none");
+    setCurrentStage(2);
+    await sleep(4000);
+    setCurrentStage(3);
+    await sleep(6000);
+    setCurrentStage(4);
     return;
 
     let presignedUrls = await getS3PresignedUrls();
@@ -163,9 +167,9 @@ export default function UploadForm({ user } : { user: User }) {
       <form onSubmit={handleFilesSubmit} >
         <div 
           ref={uploadSectionRef}
-          className={cn("overflow-clip transition-all duration-500", currentStage !== "none" ? "blur-xs" : "blur-none")}
+          className={cn("overflow-clip transition-all duration-500", currentStage > 0 ? "blur-xs" : "blur-none")}
           style= {{
-            height: currentStage !== "none" ? 0 : uploadSectionHeight,
+            height: currentStage > 0 ? 0 : uploadSectionHeight,
           }}
         >
           <FileInput
@@ -186,10 +190,10 @@ export default function UploadForm({ user } : { user: User }) {
         <Button
           type="submit"
           variant="default"
-          className={cn("cursor-pointer w-full text-lg py-6 font-semibold", currentStage !== "none" ? "mt-0" : "mt-8")}
-          disabled={filesName.length < 1 || currentStage !== "none"}
+          className={cn("cursor-pointer w-full text-lg py-6 font-semibold", currentStage > 0 ? "mt-0" : "mt-8")}
+          disabled={filesName.length < 1 || currentStage > 0}
         >
-          {currentStage !== "none" ? (
+          {currentStage > 0 ? (
             <>
               <LoaderCircle size={24} className="animate-spin" />
               Generating...
@@ -203,24 +207,20 @@ export default function UploadForm({ user } : { user: User }) {
         </Button>
       </form>
 
-      <div className="mt-8 px-4">
-        <div>
-          <p className="flex items-center gap-2 mt-4 font-semibold">
-            {/* <LoaderCircle size={18} className="animate-spin" /> */}
-            <ShimmerText text="Uploading files" shimmerWidth={100} />
-          </p>
-        </div>
-        <div className="flex items-center gap-2 mt-4 font-semibold">
-          <ShimmerText text="Extracting knowledge" shimmerWidth={100} />
-        </div>
-        <div className="flex items-center gap-2 mt-4 font-semibold">
-          <ShimmerText text="Generating quiz" shimmerWidth={100} />
-        </div>
+      <div className="mt-8 px-4 flex flex-col gap-4">
+        <StageTitle currentStage={currentStage} stage={1} title="Uploading files" />
+        <StageTitle currentStage={currentStage} stage={2} title="Extracting knowledge" />
+        <StageTitle currentStage={currentStage} stage={3} title="Generating quiz" />
       </div>
     </div>
 
+    <Button
+      onClick={() => setCurrentStage(cs => cs - 1)}
+    >Prev stage</Button>
 
-
+    <Button
+      onClick={() => setCurrentStage(cs => cs + 1)}
+    >Next stage</Button>
 
     <div className="dark:bg-zinc-900 p-4 text-sm">
       {extractingKnowledge}
@@ -231,5 +231,40 @@ export default function UploadForm({ user } : { user: User }) {
       </Link>
     </div>
     </>
+  );
+}
+
+function StageTitle({ currentStage, stage, title }: { currentStage: number, stage: number; title: string }) {
+  if (currentStage < stage) {
+    return null;
+  }
+
+  return (
+    <div className="relative h-6">
+      {/* loading: currentStage === stage  */}
+      <div 
+        className={cn(
+          "absolute inset-0 transition-all duration-300", 
+          currentStage === stage ? "blur-none opacity-100 transform-none" : "blur-xs opacity-0 -translate-y-2"
+        )}
+      >
+        <ShimmerText 
+          text={title} 
+          shimmerWidth={100} 
+          shimmerDuration={2000} 
+          className="font-semibold"
+        />
+      </div>
+      {/* done: currentStage > stage */}
+      <div 
+        className={cn(
+          "absolute inset-0 flex items-center gap-2 font-semibold text-secondary-800 transition-all duration-300",
+          currentStage > stage ? "opacity-100 transform-none" : "opacity-0 translate-y-2"
+        )}
+      >
+        <Check size={16}/>
+        <span>{title}</span>
+      </div>
+    </div>
   );
 }
