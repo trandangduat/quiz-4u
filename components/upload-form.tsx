@@ -10,16 +10,12 @@ import { Check, Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-reac
 import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
 import { Geist } from "next/font/google";
+import StreamingKnowledge from "./streaming-knowledge";
 
 type PresignedUrl = {
   fileName: string;
   url: string;
 };
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -33,7 +29,6 @@ export default function UploadForm({ user } : { user: User }) {
   const [currentStage, setCurrentStage] = useState<number>(0); //"none", "uploading", "extracting", "generating"
   const uploadSectionRef = useRef<HTMLDivElement>(null);
   const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
-  const streamingKnowledgeRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (uploadSectionRef.current) {
@@ -223,18 +218,10 @@ export default function UploadForm({ user } : { user: User }) {
           <Stage currentStage={currentStage} stage={2} mountDelay={500}>
             <StageTitle title="Extracting knowledge" />
             <StageContent>
-              <div 
-                className={cn(
-                  currentStage >= 2 ? "opacity-100" : "opacity-0",
-                  "transition-all bg-secondary/20 text-secondary-700 rounded-md py-2 px-4 text-sm max-h-64 overflow-hidden",
-                  "before:absolute before:top-0 before:left-0 before:right-0 before:bg-gradient-to-b before:from-secondary-50 before:to-transparent before:rounded-md",
-                  "after:absolute after:bottom-0 after:left-0 after:right-0 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:rounded-md",
-                  geistSans.className,
-                )}
-                ref={streamingKnowledgeRef}
-              >
-                {extractingKnowledge}
-              </div>
+              <StreamingKnowledge 
+                currentStage={currentStage}
+                extractingKnowledge={extractingKnowledge}
+              />
             </StageContent>
           </Stage>
 
@@ -268,14 +255,6 @@ export default function UploadForm({ user } : { user: User }) {
         let arrayText = text.split(" ");
         let i = 0;
         let interval = setInterval(() => {
-          console.log(streamingKnowledgeRef.current?.scrollHeight, streamingKnowledgeRef.current?.clientHeight);
-          const { scrollHeight, clientHeight } = streamingKnowledgeRef.current!;
-          if (scrollHeight > clientHeight) {
-            streamingKnowledgeRef.current?.scrollTo({
-              top: scrollHeight,
-              behavior: "smooth",
-            });
-          }
           if (i >= arrayText.length) {
             clearInterval(interval);
             return;
