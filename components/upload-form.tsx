@@ -9,11 +9,17 @@ import { Button } from "./ui/button";
 import { Check, Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
+import { Geist } from "next/font/google";
 
 type PresignedUrl = {
   fileName: string;
   url: string;
 };
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -27,6 +33,7 @@ export default function UploadForm({ user } : { user: User }) {
   const [currentStage, setCurrentStage] = useState<number>(0); //"none", "uploading", "extracting", "generating"
   const uploadSectionRef = useRef<HTMLDivElement>(null);
   const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
+  const streamingKnowledgeRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (uploadSectionRef.current) {
@@ -134,9 +141,9 @@ export default function UploadForm({ user } : { user: User }) {
     setCurrentStage(1);
     await sleep(2000);
     setCurrentStage(2);
-    await sleep(4000);
+    await sleep(40000);
     setCurrentStage(3);
-    await sleep(6000);
+    await sleep(3000);
     setCurrentStage(4);
     return;
 
@@ -207,11 +214,38 @@ export default function UploadForm({ user } : { user: User }) {
         </Button>
       </form>
 
-      <div className="mt-8 px-4 flex flex-col gap-4">
-        <StageTitle currentStage={currentStage} stage={1} title="Uploading files" />
-        <StageTitle currentStage={currentStage} stage={2} title="Extracting knowledge" />
-        <StageTitle currentStage={currentStage} stage={3} title="Generating quiz" />
-      </div>
+      {currentStage > 0 && (
+        <div className="mt-8 px-4 flex flex-col gap-4">
+          <div>
+            <StageTitle currentStage={currentStage} stage={1} title="Uploading files" />
+          </div>
+          <div>
+            <StageTitle currentStage={currentStage} stage={2} title="Extracting knowledge" />
+            <StageContent currentStage={currentStage} stage={2}>
+              <div 
+                className={cn(
+                  currentStage >= 2 ? "opacity-100" : "opacity-0",
+                  "transition-all bg-secondary/20 text-secondary-700 rounded-md py-2 px-4 text-sm max-h-64 overflow-hidden",
+                  "before:absolute before:top-0 before:left-0 before:right-0 before:bg-gradient-to-b before:from-secondary-50 before:to-transparent before:rounded-md",
+                  "after:absolute after:bottom-0 after:left-0 after:right-0 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:rounded-md",
+                  geistSans.className,
+                )}
+                ref={streamingKnowledgeRef}
+              >
+                {extractingKnowledge}
+              </div>
+            </StageContent>
+          </div>
+          <div>
+            <StageTitle currentStage={currentStage} stage={3} title="Generating quiz" />
+            <StageContent currentStage={currentStage} stage={3}>
+              <Link href={quizLink} className="text-blue-400 hover:underline">
+                Go to quiz
+              </Link>
+            </StageContent>
+          </div>
+        </div>
+      )}
     </div>
 
     <Button
@@ -222,30 +256,46 @@ export default function UploadForm({ user } : { user: User }) {
       onClick={() => setCurrentStage(cs => cs + 1)}
     >Next stage</Button>
 
-    <div className="dark:bg-zinc-900 p-4 text-sm">
-      {extractingKnowledge}
-    </div>
-    <div>
-      <Link href={quizLink} className="text-blue-400 hover:underline">
-        Go to quiz
-      </Link>
-    </div>
+    <Button
+      onClick={() => {
+        setExtractingKnowledge("");
+        let text: string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc arcu nisi, eleifend a lobortis a, egestas facilisis urna. Nam mattis quis odio quis malesuada. Aliquam maximus justo nec ultricies faucibus. Cras orci libero, lacinia at feugiat a, sagittis sit amet justo. In ultricies varius massa, sed pretium dolor elementum ut. Integer eget libero consectetur, lacinia sem ut, auctor nibh. Sed vel nulla at nisl eleifend pellentesque venenatis eu neque.\n" +
+"Praesent tempus ligula quis dapibus faucibus. Donec ac dapibus ex. Nullam eu laoreet metus. Nulla sit amet leo lectus. Quisque arcu turpis, euismod vitae condimentum eu, finibus non urna. Donec tellus ex, lobortis et nunc non, fermentum gravida tellus. Nullam semper erat vel augue cursus euismod. Phasellus facilisis odio felis, ut venenatis augue rhoncus at. Pellentesque sollicitudin feugiat ullamcorper. In congue nibh metus, sit amet rhoncus metus tincidunt sit amet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sodales ornare leo, non volutpat eros pellentesque ac. Etiam placerat consectetur magna, a dictum justo dictum ac.";
+        text += text;
+        let arrayText = text.split(" ");
+        let i = 0;
+        let interval = setInterval(() => {
+          console.log(streamingKnowledgeRef.current?.scrollHeight, streamingKnowledgeRef.current?.clientHeight);
+          const { scrollHeight, clientHeight } = streamingKnowledgeRef.current!;
+          if (scrollHeight > clientHeight) {
+            streamingKnowledgeRef.current?.scrollTo({
+              top: scrollHeight,
+              behavior: "smooth",
+            });
+          }
+          if (i >= arrayText.length) {
+            clearInterval(interval);
+            return;
+          }
+          setExtractingKnowledge(s => `${s} ${arrayText[i]}`);
+          i++;
+        }
+        , 50);
+      }}
+    >Fake streaming text</Button>
+
     </>
   );
 }
 
 function StageTitle({ currentStage, stage, title }: { currentStage: number, stage: number; title: string }) {
-  if (currentStage < stage) {
-    return null;
-  }
-
   return (
-    <div className="relative h-6">
+    <div className={cn("relative h-8")}>
       {/* loading: currentStage === stage  */}
       <div 
         className={cn(
-          "absolute inset-0 transition-all duration-300", 
-          currentStage === stage ? "blur-none opacity-100 transform-none" : "blur-xs opacity-0 -translate-y-2"
+          "absolute inset-0 transition-all duration-400", 
+          currentStage === stage ? "blur-none opacity-100 transform-none" : "blur-[2px] opacity-0 -translate-y-2"
         )}
       >
         <ShimmerText 
@@ -258,13 +308,21 @@ function StageTitle({ currentStage, stage, title }: { currentStage: number, stag
       {/* done: currentStage > stage */}
       <div 
         className={cn(
-          "absolute inset-0 flex items-center gap-2 font-semibold text-secondary-800 transition-all duration-300",
-          currentStage > stage ? "opacity-100 transform-none" : "opacity-0 translate-y-2"
+          "absolute inset-0 flex items-center gap-2 font-semibold text-secondary-800 transition-all duration-400",
+          currentStage > stage ? "blur-none opacity-100 transform-none" : "blur-[2px] opacity-0 translate-y-2"
         )}
       >
         <Check size={16}/>
         <span>{title}</span>
       </div>
+    </div>
+  );
+}
+
+function StageContent({ currentStage, stage, children }: { currentStage: number; stage: number; children: React.ReactNode }) {
+  return (
+    <div className={cn("relative m-4")}>
+      {children}
     </div>
   );
 }
