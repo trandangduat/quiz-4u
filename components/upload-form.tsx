@@ -214,36 +214,40 @@ export default function UploadForm({ user } : { user: User }) {
         </Button>
       </form>
 
-      {currentStage > 0 && (
-        <div className="mt-8 px-4 flex flex-col gap-4">
+      {currentStage >= 1 && (
+        <div className="mt-8 px-4 flex flex-col gap-4 animate-slide-in">
           <div>
             <StageTitle currentStage={currentStage} stage={1} title="Uploading files" />
           </div>
-          <div>
-            <StageTitle currentStage={currentStage} stage={2} title="Extracting knowledge" />
-            <StageContent currentStage={currentStage} stage={2}>
-              <div 
-                className={cn(
-                  currentStage >= 2 ? "opacity-100" : "opacity-0",
-                  "transition-all bg-secondary/20 text-secondary-700 rounded-md py-2 px-4 text-sm max-h-64 overflow-hidden",
-                  "before:absolute before:top-0 before:left-0 before:right-0 before:bg-gradient-to-b before:from-secondary-50 before:to-transparent before:rounded-md",
-                  "after:absolute after:bottom-0 after:left-0 after:right-0 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:rounded-md",
-                  geistSans.className,
-                )}
-                ref={streamingKnowledgeRef}
-              >
-                {extractingKnowledge}
-              </div>
-            </StageContent>
-          </div>
-          <div>
-            <StageTitle currentStage={currentStage} stage={3} title="Generating quiz" />
-            <StageContent currentStage={currentStage} stage={3}>
-              <Link href={quizLink} className="text-blue-400 hover:underline">
-                Go to quiz
-              </Link>
-            </StageContent>
-          </div>
+          {currentStage >= 2 && (
+            <div className="animate-slide-in">
+              <StageTitle currentStage={currentStage} stage={2} title="Extracting knowledge" />
+              <StageContent currentStage={currentStage} stage={2}>
+                <div 
+                  className={cn(
+                    currentStage >= 2 ? "opacity-100" : "opacity-0",
+                    "transition-all bg-secondary/20 text-secondary-700 rounded-md py-2 px-4 text-sm max-h-64 overflow-hidden",
+                    "before:absolute before:top-0 before:left-0 before:right-0 before:bg-gradient-to-b before:from-secondary-50 before:to-transparent before:rounded-md",
+                    "after:absolute after:bottom-0 after:left-0 after:right-0 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:rounded-md",
+                    geistSans.className,
+                  )}
+                  ref={streamingKnowledgeRef}
+                >
+                  {extractingKnowledge}
+                </div>
+              </StageContent>
+            </div>
+          )}
+          {currentStage >= 3 && (
+            <div className="animate-slide-in">
+              <StageTitle currentStage={currentStage} stage={3} title="Generating quiz" />
+              <StageContent currentStage={currentStage} stage={3}>
+                <Link href={quizLink} className="text-blue-400 hover:underline">
+                  Go to quiz
+                </Link>
+              </StageContent>
+            </div>
+          )}
         </div>
       )}
     </div>

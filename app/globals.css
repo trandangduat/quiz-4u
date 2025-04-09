@@ -13,6 +13,18 @@
     }
   }
 
+  --animate-slide-in: slide-in 400ms ease-out forwards;
+  @keyframes slide-in {
+    0% {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
 }
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
