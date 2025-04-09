@@ -34,7 +34,6 @@ export default function UploadForm({ user } : { user: User }) {
   const uploadSectionRef = useRef<HTMLDivElement>(null);
   const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
   const streamingKnowledgeRef = useRef<HTMLDivElement>(null);
-  const [stageTransitionDelays, setStageTransitionDelays] = useState<number[]>([400, 400, 400]);
   
   useEffect(() => {
     if (uploadSectionRef.current) {
@@ -217,38 +216,37 @@ export default function UploadForm({ user } : { user: User }) {
 
       {currentStage >= 1 && (
         <div className="mt-8 px-4 flex flex-col gap-4 animate-slide-in transition-all">
-          <Stage currentStage={currentStage} stage={1}>
+          <Stage currentStage={currentStage} stage={1} mountDelay={200}>
             <StageTitle title="Uploading files" />
           </Stage>
-          {currentStage >= 2 && (
-            <Stage currentStage={currentStage} stage={2}>
-              <StageTitle title="Extracting knowledge" />
-              <StageContent>
-                <div 
-                  className={cn(
-                    currentStage >= 2 ? "opacity-100" : "opacity-0",
-                    "transition-all bg-secondary/20 text-secondary-700 rounded-md py-2 px-4 text-sm max-h-64 overflow-hidden",
-                    "before:absolute before:top-0 before:left-0 before:right-0 before:bg-gradient-to-b before:from-secondary-50 before:to-transparent before:rounded-md",
-                    "after:absolute after:bottom-0 after:left-0 after:right-0 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:rounded-md",
-                    geistSans.className,
-                  )}
-                  ref={streamingKnowledgeRef}
-                >
-                  {extractingKnowledge}
-                </div>
-              </StageContent>
-            </Stage>
-          )}
-          {currentStage >= 3 && (
-            <Stage currentStage={currentStage} stage={3}>
-              <StageTitle title="Generating quiz" />
-              <StageContent>
-                <Link href={quizLink} className="text-blue-400 hover:underline">
-                  Go to quiz
-                </Link>
-              </StageContent>
-            </Stage>
-          )}
+
+          <Stage currentStage={currentStage} stage={2} mountDelay={500}>
+            <StageTitle title="Extracting knowledge" />
+            <StageContent>
+              <div 
+                className={cn(
+                  currentStage >= 2 ? "opacity-100" : "opacity-0",
+                  "transition-all bg-secondary/20 text-secondary-700 rounded-md py-2 px-4 text-sm max-h-64 overflow-hidden",
+                  "before:absolute before:top-0 before:left-0 before:right-0 before:bg-gradient-to-b before:from-secondary-50 before:to-transparent before:rounded-md",
+                  "after:absolute after:bottom-0 after:left-0 after:right-0 after:bg-gradient-to-t after:from-secondary-50 after:to-transparent after:rounded-md",
+                  geistSans.className,
+                )}
+                ref={streamingKnowledgeRef}
+              >
+                {extractingKnowledge}
+              </div>
+            </StageContent>
+          </Stage>
+
+          <Stage currentStage={currentStage} stage={3} mountDelay={500}>
+            <StageTitle title="Generating quiz" />
+            <StageContent>
+              <Link href={quizLink} className="text-blue-400 hover:underline">
+                Go to quiz
+              </Link>
+            </StageContent>
+          </Stage>
+
         </div>
       )}
     </div>
@@ -298,7 +296,29 @@ const StageContext = createContext({
   stage: 0,
 });
 
-function Stage({ currentStage, stage, children }: { currentStage: number; stage: number; children: React.ReactNode }) {
+type StageProps = {
+  currentStage: number;
+  stage: number;
+  mountDelay?: number; // in milliseconds
+  children: React.ReactNode;
+};
+
+function Stage({ currentStage, stage, mountDelay = 0, children }: StageProps) {
+  const [shouldMount, setShouldMount] = useState(false);
+  console.log(stage)
+
+  useEffect(() => {
+    if (currentStage !== stage) {
+      return;
+    }
+    const timeout = setTimeout(() => setShouldMount(true), mountDelay);
+    return () => clearTimeout(timeout);
+  }, [currentStage]);
+
+  if (!shouldMount) {
+    return null;
+  }
+
   return (
     <div className="animate-slide-in">
       <StageContext.Provider value={{ currentStage, stage }}>

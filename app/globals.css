@@ -16,12 +16,14 @@
   --animate-slide-in: slide-in 400ms ease-out forwards;
   @keyframes slide-in {
     0% {
-      transform: translateY(20px);
+      transform: translateY(8px);
       opacity: 0;
+      filter: blur(4px);
     }
     100% {
       transform: translateY(0);
       opacity: 1;
+      filter: blur(0);
     }
   }
 
