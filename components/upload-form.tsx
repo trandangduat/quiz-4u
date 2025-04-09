@@ -1,6 +1,6 @@
 "use client"
 
-import React, { use, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { createContext, use, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createQuiz } from "../app/action";
 import { User } from "next-auth";
@@ -34,6 +34,7 @@ export default function UploadForm({ user } : { user: User }) {
   const uploadSectionRef = useRef<HTMLDivElement>(null);
   const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
   const streamingKnowledgeRef = useRef<HTMLDivElement>(null);
+  const [stageTransitionDelays, setStageTransitionDelays] = useState<number[]>([400, 400, 400]);
   
   useEffect(() => {
     if (uploadSectionRef.current) {
@@ -141,7 +142,7 @@ export default function UploadForm({ user } : { user: User }) {
     setCurrentStage(1);
     await sleep(2000);
     setCurrentStage(2);
-    await sleep(40000);
+    await sleep(5000);
     setCurrentStage(3);
     await sleep(3000);
     setCurrentStage(4);
@@ -215,14 +216,14 @@ export default function UploadForm({ user } : { user: User }) {
       </form>
 
       {currentStage >= 1 && (
-        <div className="mt-8 px-4 flex flex-col gap-4 animate-slide-in">
-          <div>
-            <StageTitle currentStage={currentStage} stage={1} title="Uploading files" />
-          </div>
+        <div className="mt-8 px-4 flex flex-col gap-4 animate-slide-in transition-all">
+          <Stage currentStage={currentStage} stage={1}>
+            <StageTitle title="Uploading files" />
+          </Stage>
           {currentStage >= 2 && (
-            <div className="animate-slide-in">
-              <StageTitle currentStage={currentStage} stage={2} title="Extracting knowledge" />
-              <StageContent currentStage={currentStage} stage={2}>
+            <Stage currentStage={currentStage} stage={2}>
+              <StageTitle title="Extracting knowledge" />
+              <StageContent>
                 <div 
                   className={cn(
                     currentStage >= 2 ? "opacity-100" : "opacity-0",
@@ -236,17 +237,17 @@ export default function UploadForm({ user } : { user: User }) {
                   {extractingKnowledge}
                 </div>
               </StageContent>
-            </div>
+            </Stage>
           )}
           {currentStage >= 3 && (
-            <div className="animate-slide-in">
-              <StageTitle currentStage={currentStage} stage={3} title="Generating quiz" />
-              <StageContent currentStage={currentStage} stage={3}>
+            <Stage currentStage={currentStage} stage={3}>
+              <StageTitle title="Generating quiz" />
+              <StageContent>
                 <Link href={quizLink} className="text-blue-400 hover:underline">
                   Go to quiz
                 </Link>
               </StageContent>
-            </div>
+            </Stage>
           )}
         </div>
       )}
@@ -292,7 +293,24 @@ export default function UploadForm({ user } : { user: User }) {
   );
 }
 
-function StageTitle({ currentStage, stage, title }: { currentStage: number, stage: number; title: string }) {
+const StageContext = createContext({
+  currentStage: 0,
+  stage: 0,
+});
+
+function Stage({ currentStage, stage, children }: { currentStage: number; stage: number; children: React.ReactNode }) {
+  return (
+    <div className="animate-slide-in">
+      <StageContext.Provider value={{ currentStage, stage }}>
+        {children}
+      </StageContext.Provider>
+    </div>
+  );
+}
+
+function StageTitle({ title }: { title: string }) {
+  const { currentStage, stage } = useContext(StageContext);
+
   return (
     <div className={cn("relative h-8")}>
       {/* loading: currentStage === stage  */}
@@ -323,7 +341,7 @@ function StageTitle({ currentStage, stage, title }: { currentStage: number, stag
   );
 }
 
-function StageContent({ currentStage, stage, children }: { currentStage: number; stage: number; children: React.ReactNode }) {
+function StageContent({ children }: { children: React.ReactNode }) {
   return (
     <div className={cn("relative m-4")}>
       {children}
