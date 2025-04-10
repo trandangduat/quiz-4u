@@ -284,7 +284,6 @@ type StageProps = {
 
 function Stage({ currentStage, stage, mountDelay = 0, children }: StageProps) {
   const [shouldMount, setShouldMount] = useState(false);
-  console.log(stage)
 
   useEffect(() => {
     if (currentStage !== stage) {
