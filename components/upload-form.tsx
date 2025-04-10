@@ -215,8 +215,8 @@ export default function UploadForm({ user } : { user: User }) {
       </form>
 
       {currentStage >= 1 && (
-        <div className="flex flex-col gap-4 animate-slide-in transition-all">
-          <Stage currentStage={currentStage} stage={1} mountDelay={700}>
+        <div className="flex flex-col animate-slide-in transition-all">
+          <Stage currentStage={currentStage} stage={1} mountDelay={700} className="mt-8">
             <StageTitle title="Uploading files" />
           </Stage>
 
@@ -344,9 +344,10 @@ type StageProps = {
   stage: number;
   mountDelay?: number; // in milliseconds
   children: React.ReactNode;
+  className?: string;
 };
 
-function Stage({ currentStage, stage, mountDelay = 0, children }: StageProps) {
+function Stage({ currentStage, stage, mountDelay = 0, children, className }: StageProps) {
   const [shouldMount, setShouldMount] = useState(false);
 
   useEffect(() => {
@@ -362,7 +363,7 @@ function Stage({ currentStage, stage, mountDelay = 0, children }: StageProps) {
   }
 
   return (
-    <div className="animate-slide-in">
+    <div className={cn("animate-slide-in mx-6 mt-2", className)}>
       <StageContext.Provider value={{ currentStage, stage }}>
         {children}
       </StageContext.Provider>
@@ -378,7 +379,7 @@ function StageTitle({ title }: { title: string }) {
       {/* loading: currentStage === stage  */}
       <div 
         className={cn(
-          "absolute inset-0 transition-all duration-400", 
+          "absolute inset-0 transition-all duration-400 flex items-center", 
           currentStage === stage ? "blur-none opacity-100 transform-none" : "blur-[2px] opacity-0 -translate-y-2"
         )}
       >
