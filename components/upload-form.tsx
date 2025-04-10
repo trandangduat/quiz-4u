@@ -131,7 +131,6 @@ export default function UploadForm({ user } : { user: User }) {
 
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
-    console.log("then second")
 
     setCurrentStage(1);
     await sleep(2000);
@@ -142,17 +141,21 @@ export default function UploadForm({ user } : { user: User }) {
     setCurrentStage(4);
     return;
 
+    setCurrentStage(1);
     let presignedUrls = await getS3PresignedUrls();
     if (presignedUrls.length < 1) {
       return;
     }
     console.time("upload files to s3");
-    // await uploadFilesToS3(presignedUrls);
+    await uploadFilesToS3(presignedUrls);
     console.timeEnd("upload files to s3");
 
+    setCurrentStage(2);
     console.time("extract knowledge");
     let knowledge = await extractDocumentsKnowledge(filesName, filesType);
     console.timeEnd("extract knowledge");
+
+    setCurrentStage(3);
     console.time("gen quiz");
     const { quiz } = await generateQuiz(knowledge, 10);
     console.log(quiz);
@@ -161,6 +164,8 @@ export default function UploadForm({ user } : { user: User }) {
     if (quizId !== "Error") {
       setQuizLink(`/quiz/${quizId}`);
     }
+
+    setCurrentStage(4);
   }
 
   return (
@@ -228,9 +233,13 @@ export default function UploadForm({ user } : { user: User }) {
           <Stage currentStage={currentStage} stage={3} mountDelay={500}>
             <StageTitle title="Generating quiz" />
             <StageContent>
-              <Link href={quizLink} className="text-blue-400 hover:underline">
-                Go to quiz
-              </Link>
+              {quizLink === "#" ? (
+                <span>No quiz available yet.</span>
+              ) : (
+                <Link href={quizLink} className="text-blue-400 hover:underline">
+                  Go to quiz
+                </Link>
+              )}
             </StageContent>
           </Stage>
 
@@ -249,8 +258,63 @@ export default function UploadForm({ user } : { user: User }) {
     <Button
       onClick={() => {
         setExtractingKnowledge("");
-        let text: string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc arcu nisi, eleifend a lobortis a, egestas facilisis urna. Nam mattis quis odio quis malesuada. Aliquam maximus justo nec ultricies faucibus. Cras orci libero, lacinia at feugiat a, sagittis sit amet justo. In ultricies varius massa, sed pretium dolor elementum ut. Integer eget libero consectetur, lacinia sem ut, auctor nibh. Sed vel nulla at nisl eleifend pellentesque venenatis eu neque.\n" +
-"Praesent tempus ligula quis dapibus faucibus. Donec ac dapibus ex. Nullam eu laoreet metus. Nulla sit amet leo lectus. Quisque arcu turpis, euismod vitae condimentum eu, finibus non urna. Donec tellus ex, lobortis et nunc non, fermentum gravida tellus. Nullam semper erat vel augue cursus euismod. Phasellus facilisis odio felis, ut venenatis augue rhoncus at. Pellentesque sollicitudin feugiat ullamcorper. In congue nibh metus, sit amet rhoncus metus tincidunt sit amet. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sodales ornare leo, non volutpat eros pellentesque ac. Etiam placerat consectetur magna, a dictum justo dictum ac.";
+        let text: string = `# Lacerare foret
+
+## Quosque molire quantus degener rebello addidit urguet
+
+Lorem markdownum Eryx, est concepit, sine licet; ex admota si imagine. Buten
+animoque magnas luctus spatio crimine durus, me tardi et duro caeli, ad erat
+sanguine subit de! Aere vincere missi et rigescere coepit nec, ara gemma
+vertitur nisi superbus collo ululatus. Terra comis. In haec; perdes et ferarum
+laurus; aut recludi piscem omnes, danda, visa.
+
+    if (miniSpeakers) {
+        parity += 3 + rayLogicRate;
+    }
+    if (4) {
+        https_hfs_lamp /= autoresponderRasterCase;
+    } else {
+        soft(scan_plagiarism_ios - primary);
+        mask_megapixel_bar += ditheringItunes + 2 + isaMedia;
+        queryInterface(softwareArchitectureAnd * inkjetModel);
+    }
+    nodeSataDac.minicomputerLock += 850711;
+    var online = -5 / 1;
+    zebibyteOpen(noc_atm_impact + text);
+
+Limina at demptos, hoc est te fuso pectus bracchia saucius ac *est formosos*
+ignorant cupidusque *urbem* et simul, erat. Est domum, vicibus me crede Augusto
+te monstri segetes nisi Venus saevaeque concipit latrator remoliri **nuntia
+relicta**. Illa defecta riget aut validos: sumit nunc!
+
+- Iuncta egressus si tanto Stygia gravitate unum
+- Auro isset ad somnus dulcedine
+- Dicenti cognitius spinae propiusque boum et colebas
+
+## Latus generum
+
+Creatus stridentibus **dixit** est patris resedit moenibus potest colonus ignes
+[tacuit](http://www.amansmedia.net/) et internodia multaque exsul brevis vobis
+vixque: mutabit. Hamo nervo locis in quid lactis forte, et videri miratur suas
+ad erit haesit illis, id noviens Liternum. Partibus militiae semina; cuncta
+solet flores, castra scylla tantaeque deinde. Ipse infringat, iuste posti
+retinacula et, [quam](http://www.dictis.org/et-ex) omne sic.
+
+1. Ante fugit cum
+2. Levabas quaecumque ignis
+3. Mulcebant tempus vinclisque certos vicimus murra contingere
+4. Fecissent terras inania
+5. Eandem molli cingere Echidnaeae innuba dextra utque
+
+Esset sit sospes iubent. Hic hoc inexcusabile non austro salutifer riguisse
+undas est inque moveri, parvum hederae, in oris, quae quondamque. Annum mea
+poscit, insuetum, solvere mundus coma? Sacris hunc petit celebrare mora pervenit
+poenas oraque, et sit dammis antiquus et.
+
+Dominari sparsitque est; certans foedataque fera tendens noverca Pelagonaque
+latet vocat? Loquax ne erit dentibus vacuae, quo vos, conlapsus Ionium oculos
+Danae adulantum odoribus respicit accipe vox Capitolia.
+`;
         text += text;
         let arrayText = text.split(" ");
         let i = 0;
