@@ -215,8 +215,8 @@ export default function UploadForm({ user } : { user: User }) {
       </form>
 
       {currentStage >= 1 && (
-        <div className="mt-8 px-4 flex flex-col gap-4 animate-slide-in transition-all">
-          <Stage currentStage={currentStage} stage={1} mountDelay={200}>
+        <div className="flex flex-col gap-4 animate-slide-in transition-all">
+          <Stage currentStage={currentStage} stage={1} mountDelay={700}>
             <StageTitle title="Uploading files" />
           </Stage>
 
