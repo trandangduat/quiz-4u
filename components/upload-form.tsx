@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
 import { Geist } from "next/font/google";
 import StreamingKnowledge from "./streaming-knowledge";
+import QuizCard from "./quiz-card";
 
 type PresignedUrl = {
   fileName: string;
@@ -149,7 +150,7 @@ export default function UploadForm({ user } : { user: User }) {
     setCurrentStage(4);
     setQuizInfo({
       id: 'test-id',
-      title: 'Example Quiz Title',
+      title: 'Tín hiệu và hệ thống',
       questionCount: 10,
       createdAt: new Date().toISOString(),
     });
@@ -250,22 +251,7 @@ export default function UploadForm({ user } : { user: User }) {
           <Stage currentStage={currentStage} stage={3} mountDelay={500}>
             <StageTitle title="Generating quiz" />
             <StageContent mountCondition={quizInfo !== null}>
-              <Link href={quizLink}>
-                <div className="border bg-card/50 rounded-md py-4 px-6 transition-all hover:shadow-xl">
-                    <div className="flex items-center gap-4">
-                      <ClipboardList size={40} className="text-secondary-800" />
-                      <div className="flex flex-col gap-1 items-start">
-                        <div>
-                          <span className="font-bold text-secondary-900">{quizInfo?.title || 'Quiz Generated'}</span>
-                        </div>
-                        
-                        <div className="bg-secondary px-2 py-0.5 rounded-md inline-block text-muted-foreground text-[12px]">
-                          <span>{quizInfo?.questionCount || 0} questions</span>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </Link>
+              <QuizCard quizLink={quizLink} quizInfo={quizInfo!} />
             </StageContent>
           </Stage>
 
