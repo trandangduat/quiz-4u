@@ -18,7 +18,7 @@ export default function QuizCard({ quizLink, quizInfo } : { quizLink: string, qu
                     <div>
                         <span className="font-bold text-primary-800 transition-colors group-hover:text-primary-900">{quizInfo?.title || 'Quiz Generated'}</span>
                     </div>
-                    <div className="bg-primary-300/20 text-primary-800 px-3 py-0.5 rounded-md inline-block text-[12px]">
+                    <div className="bg-secondary-200 text-primary-800 px-3 py-0.5 rounded-md inline-block text-[12px]">
                         <span>{quizInfo?.questionCount || 0} questions</span>
                     </div>
                     </div>
