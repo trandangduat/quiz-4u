@@ -6,7 +6,7 @@ import { createQuiz } from "../app/action";
 import { User } from "next-auth";
 import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
-import { Check, Files, LoaderCircle, LoaderPinwheel, Sparkle } from "lucide-react";
+import { CalendarIcon, Check, Clock, ClipboardList, Files, FileText, LoaderCircle, LoaderPinwheel, Sparkle, User as UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
 import { Geist } from "next/font/google";
@@ -17,6 +17,13 @@ type PresignedUrl = {
   url: string;
 };
 
+type QuizInfo = {
+  id: string;
+  title: string;
+  questionCount: number;
+  createdAt: string;
+};
+
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default function UploadForm({ user } : { user: User }) {
@@ -25,6 +32,7 @@ export default function UploadForm({ user } : { user: User }) {
   const [filesType, setFilesType] = useState<string[]>([]);
   const [filesSize, setFilesSize] = useState<number[]>([]);
   const [quizLink, setQuizLink] = useState<string>("#");
+  const [quizInfo, setQuizInfo] = useState<QuizInfo | null>(null);
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
   const [currentStage, setCurrentStage] = useState<number>(0); //"none", "uploading", "extracting", "generating"
   const uploadSectionRef = useRef<HTMLDivElement>(null);
@@ -139,6 +147,13 @@ export default function UploadForm({ user } : { user: User }) {
     setCurrentStage(3);
     await sleep(3000);
     setCurrentStage(4);
+    setQuizInfo({
+      id: 'test-id',
+      title: 'Example Quiz Title',
+      questionCount: 10,
+      createdAt: new Date().toISOString(),
+    });
+    setQuizLink('#');
     return;
 
     setCurrentStage(1);
@@ -160,9 +175,10 @@ export default function UploadForm({ user } : { user: User }) {
     const { quiz } = await generateQuiz(knowledge, 10);
     console.log(quiz);
     console.timeEnd("gen quiz");
-    let quizId = await createQuiz(quiz, user.id!, knowledge);
-    if (quizId !== "Error") {
-      setQuizLink(`/quiz/${quizId}`);
+    const result = await createQuiz(quiz, user.id!, knowledge);
+    if (result !== "Error") {
+      setQuizInfo(result);
+      setQuizLink(`/quiz/${result.id}`);
     }
 
     setCurrentStage(4);
@@ -233,14 +249,23 @@ export default function UploadForm({ user } : { user: User }) {
 
           <Stage currentStage={currentStage} stage={3} mountDelay={500}>
             <StageTitle title="Generating quiz" />
-            <StageContent>
-              {quizLink === "#" ? (
-                <span>No quiz available yet.</span>
-              ) : (
-                <Link href={quizLink} className="text-blue-400 hover:underline">
-                  Go to quiz
-                </Link>
-              )}
+            <StageContent mountCondition={quizInfo !== null}>
+              <Link href={quizLink}>
+                <div className="border bg-card/50 rounded-md py-4 px-6 transition-all hover:shadow-xl">
+                    <div className="flex items-center gap-4">
+                      <ClipboardList size={40} className="text-secondary-800" />
+                      <div className="flex flex-col gap-1 items-start">
+                        <div>
+                          <span className="font-bold text-secondary-900">{quizInfo?.title || 'Quiz Generated'}</span>
+                        </div>
+                        
+                        <div className="bg-secondary px-2 py-0.5 rounded-md inline-block text-muted-foreground text-[12px]">
+                          <span>{quizInfo?.questionCount || 0} questions</span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </Link>
             </StageContent>
           </Stage>
 
@@ -248,18 +273,20 @@ export default function UploadForm({ user } : { user: User }) {
       )}
     </div>
 
-    <Button
-      onClick={() => setCurrentStage(cs => cs - 1)}
-    >Prev stage</Button>
+    {process.env.NODE_ENV === 'development' && (
+      <>
+        <Button
+          onClick={() => setCurrentStage(cs => cs - 1)}
+        >Prev stage</Button>
 
-    <Button
-      onClick={() => setCurrentStage(cs => cs + 1)}
-    >Next stage</Button>
+        <Button
+          onClick={() => setCurrentStage(cs => cs + 1)}
+        >Next stage</Button>
 
-    <Button
-      onClick={() => {
-        setExtractingKnowledge("");
-        let text: string = `# Lacerare foret
+        <Button
+          onClick={() => {
+            setExtractingKnowledge("");
+            let text: string = `# Lacerare foret
 
 ## Quosque molire quantus degener rebello addidit urguet
 
@@ -316,21 +343,22 @@ Dominari sparsitque est; certans foedataque fera tendens noverca Pelagonaque
 latet vocat? Loquax ne erit dentibus vacuae, quo vos, conlapsus Ionium oculos
 Danae adulantum odoribus respicit accipe vox Capitolia.
 `;
-        text += text;
-        let arrayText = text.split(" ");
-        let i = 0;
-        let interval = setInterval(() => {
-          if (i >= arrayText.length) {
-            clearInterval(interval);
-            return;
-          }
-          setExtractingKnowledge(s => `${s} ${arrayText[i]}`);
-          i++;
-        }
-        , 50);
-      }}
-    >Fake streaming text</Button>
-
+            text += text;
+            let arrayText = text.split(" ");
+            let i = 0;
+            let interval = setInterval(() => {
+              if (i >= arrayText.length) {
+                clearInterval(interval);
+                return;
+              }
+              setExtractingKnowledge(s => `${s} ${arrayText[i]}`);
+              i++;
+            }
+            , 50);
+          }}
+        >Fake streaming text</Button>
+      </>
+    )}
     </>
   );
 }

@@ -37,7 +37,12 @@ export async function createQuiz(quiz: Quiz, userId: string, knowledge: string) 
         
         const createdQuiz = knowledgeEntry.quizzes[0];
         console.log(createdQuiz);
-        return createdQuiz.id;
+        return {
+            id: createdQuiz.id,
+            title: createdQuiz.title,
+            questionCount: createdQuiz.questions.length,
+            createdAt: createdQuiz.createdAt,
+        };
     } catch (e) {
         console.error(e);
         return "Error";
