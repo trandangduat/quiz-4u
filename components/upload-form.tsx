@@ -222,9 +222,10 @@ export default function UploadForm({ user } : { user: User }) {
 
           <Stage currentStage={currentStage} stage={2} mountDelay={500}>
             <StageTitle title="Extracting knowledge" />
-            <StageContent>
+            <StageContent
+              mountCondition={extractingKnowledge.length > 0}
+            >
               <StreamingKnowledge 
-                currentStage={currentStage}
                 extractingKnowledge={extractingKnowledge}
               />
             </StageContent>
@@ -404,9 +405,35 @@ function StageTitle({ title }: { title: string }) {
   );
 }
 
-function StageContent({ children }: { children: React.ReactNode }) {
+function StageContent({ 
+  children, 
+  mountDelay, 
+  mountCondition 
+}: { 
+  children: React.ReactNode; 
+  mountDelay?: number; 
+  mountCondition?: boolean 
+}) {
+  const [shouldMount, setShouldMount] = useState(mountCondition || false);
+
+  useEffect(() => {
+    if (mountDelay === undefined) {
+      return;
+    }
+    const timeout = setTimeout(() => setShouldMount(true), mountDelay || 0);
+    return () => clearTimeout(timeout);
+  }, [mountDelay]);
+
+  useEffect(() => {
+    setShouldMount(mountCondition || false);
+  }, [mountCondition]);
+
+  if (!shouldMount) {
+    return null;
+  }
+
   return (
-    <div className={cn("relative m-4")}>
+    <div className={cn("relative m-4 animate-slide-in")}>
       {children}
     </div>
   );
