@@ -6,10 +6,9 @@ import { createQuiz } from "../app/action";
 import { User } from "next-auth";
 import { FileInput, FileInputList } from "./ui/file-input";
 import { Button } from "./ui/button";
-import { CalendarIcon, Check, Clock, ClipboardList, Files, FileText, LoaderCircle, LoaderPinwheel, Sparkle, User as UserIcon } from "lucide-react";
+import { Check, LoaderCircle, Sparkle, User as UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
-import { Geist } from "next/font/google";
 import StreamingKnowledge from "./streaming-knowledge";
 import QuizCard from "./quiz-card";
 
@@ -36,14 +35,6 @@ export default function UploadForm({ user } : { user: User }) {
   const [quizInfo, setQuizInfo] = useState<QuizInfo | null>(null);
   const [extractingKnowledge, setExtractingKnowledge] = useState<string>("");
   const [currentStage, setCurrentStage] = useState<number>(0); //"none", "uploading", "extracting", "generating"
-  const uploadSectionRef = useRef<HTMLDivElement>(null);
-  const [uploadSectionHeight, setUploadSectionHeight] = useState<string>("auto");
-  
-  useEffect(() => {
-    if (uploadSectionRef.current) {
-      setUploadSectionHeight(`${uploadSectionRef.current.scrollHeight}px`);
-    }
-  }, [filesName, currentStage]);
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
     if (!filesRef.current || !filesRef.current.files) {
@@ -189,27 +180,28 @@ export default function UploadForm({ user } : { user: User }) {
     <>
     <div className="p-8 m-8 rounded-xl border-2 border-dashed border-secondary/90 bg-linear-to-t from-secondary/30 to-primary-100/10">
       <form onSubmit={handleFilesSubmit} >
-        <div 
-          ref={uploadSectionRef}
-          className={cn("overflow-clip transition-all duration-500", currentStage > 0 ? "blur-xs" : "blur-none")}
-          style= {{
-            height: currentStage > 0 ? 0 : uploadSectionHeight,
-          }}
-        >
-          <FileInput
-            type="file"
-            ref={filesRef}
-            multiple
-            onChange={handleInputChange}
-            accept="application/pdf, application/x-javascript, text/javascript, application/x-python, text/x-python, text/plain, text/html, text/css, text/md, text/csv, text/xml, text/rtf"
-          />
-          <FileInputList
-            filesName={filesName}
-            filesType={filesType}
-            filesSize={filesSize}
-            className="mt-4"
-            hasFiles={filesName.length > 0}
-          />
+        <div className={cn(
+          "grid transition-all duration-400",
+          currentStage > 0 ? "grid-rows-[0fr] blur-xs" : "grid-rows-[1fr] blur-none",
+        )}>
+          <div
+            className={cn("overflow-hidden")}
+          >
+            <FileInput
+              type="file"
+              ref={filesRef}
+              multiple
+              onChange={handleInputChange}
+              accept="application/pdf, application/x-javascript, text/javascript, application/x-python, text/x-python, text/plain, text/html, text/css, text/md, text/csv, text/xml, text/rtf"
+            />
+            <FileInputList
+              filesName={filesName}
+              filesType={filesType}
+              filesSize={filesSize}
+              className="mt-4"
+              hasFiles={filesName.length > 0}
+            />
+          </div>
         </div>
         <Button
           type="submit"
@@ -225,7 +217,7 @@ export default function UploadForm({ user } : { user: User }) {
           ) : (
             <>
               <Sparkle size={24} />
-              Generate 
+              Generate
             </>
           )}
         </Button>
@@ -242,7 +234,7 @@ export default function UploadForm({ user } : { user: User }) {
             <StageContent
               mountCondition={extractingKnowledge.length > 0}
             >
-              <StreamingKnowledge 
+              <StreamingKnowledge
                 extractingKnowledge={extractingKnowledge}
               />
             </StageContent>
@@ -392,21 +384,21 @@ function StageTitle({ title }: { title: string }) {
   return (
     <div className={cn("relative h-8")}>
       {/* loading: currentStage === stage  */}
-      <div 
+      <div
         className={cn(
-          "absolute inset-0 transition-all duration-400 flex items-center", 
+          "absolute inset-0 transition-all duration-400 flex items-center",
           currentStage === stage ? "blur-none opacity-100 transform-none" : "blur-[2px] opacity-0 -translate-y-2"
         )}
       >
-        <ShimmerText 
-          text={title} 
-          shimmerWidth={100} 
-          shimmerDuration={2000} 
+        <ShimmerText
+          text={title}
+          shimmerWidth={100}
+          shimmerDuration={2000}
           className="font-semibold"
         />
       </div>
       {/* done: currentStage > stage */}
-      <div 
+      <div
         className={cn(
           "absolute inset-0 flex items-center gap-2 font-semibold text-secondary-800 transition-all duration-400",
           currentStage > stage ? "blur-none opacity-100 transform-none" : "blur-[2px] opacity-0 translate-y-2"
@@ -419,14 +411,14 @@ function StageTitle({ title }: { title: string }) {
   );
 }
 
-function StageContent({ 
-  children, 
-  mountDelay, 
-  mountCondition 
-}: { 
-  children: React.ReactNode; 
-  mountDelay?: number; 
-  mountCondition?: boolean 
+function StageContent({
+  children,
+  mountDelay,
+  mountCondition
+}: {
+  children: React.ReactNode;
+  mountDelay?: number;
+  mountCondition?: boolean
 }) {
   const [shouldMount, setShouldMount] = useState(mountCondition || false);
 

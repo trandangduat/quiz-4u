@@ -4,10 +4,11 @@ import Link from "next/link";
 export default function QuizCard({ quizLink, quizInfo } : { quizLink: string, quizInfo: { title: string, questionCount: number } }) {
     return (
         <Link href={quizLink}>
-            <div 
+            <div
                 className="
                     bg-linear-to-br from-secondary-100/50 to-secondary-200 border-2 border-secondary rounded-md py-4 px-6
                     group hover:bg-secondary-200 hover:scale-105 hover:border-secondary-300
+                    active:scale-100 active:border-secondary-200
                     transition-all duration-200 ease-in-out
                 ">
                 <div className="flex items-center gap-4">
