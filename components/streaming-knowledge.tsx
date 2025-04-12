@@ -16,7 +16,7 @@ export default function StreamingKnowledge({
     extractingKnowledge: string;
 }) {
     const streamingKnowledgeRef = useRef<HTMLDivElement>(null);
-    
+
     useEffect(() => {
         if (!streamingKnowledgeRef.current) {
             return;
@@ -31,15 +31,15 @@ export default function StreamingKnowledge({
     }, [extractingKnowledge]);
 
     return (
-        <div 
+        <div
             className={cn(
-                "bg-linear-to-tl border from-secondary/50 to-transparent rounded-md py-4 px-6 max-h-64 overflow-y-auto",
+                "bg-card dark:bg-secondary/30 rounded-md py-4 px-6 max-h-64 overflow-y-auto",
                 geistSans.className,
                 "custom-scrollbar"
             )}
             ref={streamingKnowledgeRef}
         >
-            <article className="prose prose-sm dark:prose-invert prose-headings:text-secondary-800 prose-slate text-secondary-700">
+            <article className="prose prose-sm dark:prose-invert prose-slate mx-auto prose-headings:text-primary-800 prose-p:text-primary-700 prose-strong:text-primary-800 prose-li:text-primary-700 prose-a:text-primary-800">
                 <Markdown>{extractingKnowledge}</Markdown>
             </article>
         </div>

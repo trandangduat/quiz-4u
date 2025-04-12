@@ -37,8 +37,8 @@ export const FileInput = ({ className, ...props }: FileInputProps & React.Compon
         className="w-full flex flex-col justify-center items-center"
       >
         <FileInputSymbol />
-        <p className={cn("text-2xl dark:text-primary-900 mt-6 font-semibold")}>
-          Upload or drag <span className="">documents</span> 
+        <p className={cn("text-2xl mt-6 font-semibold")}>
+          Upload or drag <span className="">documents</span>
         </p>
         <p className={cn("text-sm dark:text-primary-900/70 mt-1")}>
           Maximum 5MB per file
@@ -112,35 +112,35 @@ const FileTypeIcons = {
 
 const getFileIcon = (fileType?: string, size?:string) => {
   if (!fileType) return <FileTypeIcons.Default className={size} />;
-  
+
   if (fileType.includes('image')) return <FileTypeIcons.Image className={size} />;
   if (fileType.includes('pdf')) return <FileTypeIcons.PDF className={size} />;
   if (fileType.includes('word') || fileType.includes('document')) return <FileTypeIcons.Word className={size} />;
   if (fileType.includes('excel') || fileType.includes('spreadsheet')) return <FileTypeIcons.Excel className={size} />;
-  
+
   return <FileTypeIcons.Default className={size} />;
 };
 
 export const FileInputList = ({className, filesName = [], filesType = [], filesSize = [], hasFiles} : FileInputListProps) => {
   if (!hasFiles || filesName.length === 0) return null;
-  
+
   return (
     <div className={cn("w-full mx-auto mt-4", className)}>
-      <div className="bg-primary-500/10 dark:bg-slate-800/20 rounded-xl p-6">
-        <h3 className="text-sm font-medium mb-3 dark:text-slate-300">Uploaded Files</h3>
+      <div className="bg-secondary/20 rounded-xl p-6">
+        <h3 className="text-sm font-medium mb-3">Uploaded Files</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {filesName.map((name, index) => (
-            <div 
-              key={index} 
-              className="flex flex-row gap-2 overflow-hidden bg-white/50 dark:bg-slate-700/50 p-3 rounded-lg hover:bg-white/80 dark:hover:bg-slate-700/80 shadow-sm"
+            <div
+              key={index}
+              className="flex flex-row gap-2 overflow-hidden bg-secondary/30 p-3 rounded-lg hover:bg-secondary/70 shadow-sm"
             >
               <div className="flex-shrink-0 w-10">
                 {getFileIcon(filesType[index], "h-10 w-10")}
               </div>
               <div className="flex flex-col min-w-0 flex-1">
-                <span 
+                <span
                   className={cn(
-                    "text-sm block font-semibold break-all line-clamp-2", 
+                    "text-sm block font-semibold break-all line-clamp-2",
                     geistMono.className
                   )}
                   title={name} // Show full name on hover

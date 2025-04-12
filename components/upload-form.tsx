@@ -178,7 +178,7 @@ export default function UploadForm({ user } : { user: User }) {
 
   return (
     <>
-    <div className="p-8 m-8 rounded-xl border-2 border-dashed border-secondary/90 bg-linear-to-t from-secondary/30 to-primary-100/10">
+    <div className="p-8 rounded-xl bg-secondary/15">
       <form onSubmit={handleFilesSubmit} >
         <div className={cn(
           "grid transition-all duration-400",
