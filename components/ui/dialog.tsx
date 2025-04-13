@@ -2,11 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 type DialogProps = {
   children: React.ReactNode;
-  className?: string;
 };
 
 const DialogContext = createContext<{
@@ -17,7 +16,7 @@ const DialogContext = createContext<{
   setOpen: (open: boolean) => {}
 });
 
-export const Dialog = ({ children, className }: DialogProps) => {
+export const Dialog = ({ children }: DialogProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -43,15 +42,28 @@ type DialogContentProps = {
 };
 
 export const DialogContent = ({ children, className }: DialogContentProps) => {
-  const { open } = useContext(DialogContext);
+  const { open, setOpen } = useContext(DialogContext);
+  const dialogContentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className={cn(
-      "fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-all",
-      open ? "visible" : "invisible",
-      className
-    )}>
-      <div className={cn("bg-card dark:bg-secondary/25 rounded-md p-6 flex flex-col gap-6", className)}>
+    <div
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-all duration-200",
+        open ? "opacity-100" : "opacity-0 pointer-events-none",
+        className
+      )}
+      ref={dialogContentRef}
+      onMouseDown={(e) => {
+        if (dialogContentRef.current && dialogContentRef.current === (e.target as Node)) {
+          setOpen(false);
+        }
+      }}
+    >
+      <div className={cn(
+        "bg-card dark:bg-secondary/25 w-full max-w-md rounded-md p-6 flex flex-col gap-6 transition-all duration-200",
+        open ? "scale-100 opacity-100" : "scale-95 opacity-0",
+        className
+      )}>
         {children}
       </div>
     </div>
@@ -69,12 +81,12 @@ export const DialogHeader = ({ className, title, description }: DialogHeaderProp
 
   return (
     <div className={cn("flex flex-row justify-between items-center gap-4", className)}>
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-1">
         {title && <span className="text-lg font-semibold">{title}</span>}
-        {description && <span className="text-sm text-muted-foreground">{description}</span>}
+        {description && <span className="text-sm text-foreground/90">{description}</span>}
       </div>
       <div>
-        <X size={16} className="cursor-pointer" onClick={() => setOpen(false)} />
+        <X size={16} className="cursor-pointer opacity-75 hover:opacity-100" onClick={() => setOpen(false)} />
       </div>
     </div>
   );

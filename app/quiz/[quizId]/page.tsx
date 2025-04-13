@@ -66,7 +66,7 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                                         <label htmlFor="shuffle" className="text-sm cursor-pointer">Shuffle questions</label>
                                     </div>
                                 </div>
-                                <div className="flex justify-end mt-4">
+                                <div className="flex justify-end mt-8">
                                     <Button type="submit" className="font-semibold flex flex-row gap-2 items-center">
                                         <ArrowRight size={16} />
                                         Let's go
