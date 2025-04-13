@@ -1,7 +1,7 @@
 import { ClipboardList } from "lucide-react";
 import Link from "next/link";
 
-export default function QuizCard({ quizLink, quizInfo } : {
+export default function UploadQuizCard({ quizLink, quizInfo } : {
   quizLink: string,
   quizInfo: {
     title: string,
@@ -16,7 +16,6 @@ export default function QuizCard({ quizLink, quizInfo } : {
                     bg-card dark:bg-secondary/25 rounded-md p-6
                     group dark:hover:bg-secondary/50 hover:scale-103
                     active:scale-100 transition-all duration-200 ease-in-out
-                    h-full
                 ">
                 <div className="flex items-center gap-4">
                     <div className="bg-primary-200/50 dark:bg-secondary-400/50 group-hover:bg-primary-300/50 dark:group-hover:bg-secondary-300 transition-colors rounded-full p-4">
@@ -30,11 +29,6 @@ export default function QuizCard({ quizLink, quizInfo } : {
                             <div className="inline-block text-xs">
                                 <span>{quizInfo?.questionCount || 0} questions</span>
                             </div>
-                            {quizInfo?.createdAt && (
-                                <div className="inline-block text-xs text-muted-foreground">
-                                    <span>Created {new Date(quizInfo.createdAt).toLocaleDateString()}</span>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

@@ -10,7 +10,7 @@ import { Check, LoaderCircle, Sparkle, User as UserIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShimmerText from "./ui/shimmer-text";
 import StreamingKnowledge from "./streaming-knowledge";
-import QuizCard from "./quiz-card";
+import UploadQuizCard from "./upload-quiz-card";
 
 type PresignedUrl = {
   fileName: string;
@@ -243,7 +243,7 @@ export default function UploadForm({ user } : { user: User }) {
           <Stage currentStage={currentStage} stage={3} mountDelay={500}>
             <StageTitle title="Generating quiz" />
             <StageContent mountCondition={quizInfo !== null}>
-              <QuizCard quizLink={quizLink} quizInfo={quizInfo!} />
+              <UploadQuizCard quizLink={quizLink} quizInfo={quizInfo!} />
             </StageContent>
           </Stage>
 
