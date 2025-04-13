@@ -132,7 +132,7 @@ export const FileInputList = ({className, filesName = [], filesType = [], filesS
           {filesName.map((name, index) => (
             <div
               key={index}
-              className="flex flex-row gap-2 overflow-hidden bg-secondary/30 p-3 rounded-lg hover:bg-secondary/70 shadow-sm"
+              className="flex flex-row gap-2 overflow-hidden bg-gray-100 dark:bg-secondary/40 p-3 rounded-lg hover:bg-card dark:hover:bg-secondary/70 shadow-sm"
             >
               <div className="flex-shrink-0 w-10">
                 {getFileIcon(filesType[index], "h-10 w-10")}
