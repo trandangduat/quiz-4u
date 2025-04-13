@@ -78,15 +78,29 @@ function Question ({ Q, userChoices, setUserChoices, answer, questionNumber } :
     return (
         <div
             id={`question-${Q.id}`}
-            className={cn("rounded-lg p-5 bg-white dark:bg-secondary/25")}
+            className={cn("rounded-lg bg-white dark:bg-secondary/25")}
         >
-            <div className="flex items-center gap-2">
-                <span className="bg-primary/10 text-primary font-medium rounded-full w-7 h-7 flex items-center justify-center">
-                    {questionNumber}
-                </span>
-                <p className="font-semibold">{Q.question}</p>
+            <div className="flex items-center justify-between gap-4 p-4 border-b dark:border-secondary/50">
+                <div className="flex items-center gap-2">
+                    <span className="bg-primary/10 text-primary font-medium rounded-full w-7 h-7 flex items-center justify-center">
+                        {questionNumber}
+                    </span>
+                    <p className="font-semibold">{Q.question}</p>
+                </div>
+                <div className="">
+                    <Button
+                        variant="soft"
+                        className="p-2 rounded-full hover:bg-secondary/50"
+                        onClick={() => setUserChoices({ ...userChoices, [Q.id]: undefined })}
+                        aria-label="Reset answer"
+                        disabled={userChoices[Q.id] === undefined || answer !== undefined}
+                    >
+                        <X size={16} />
+                        Reset answer
+                    </Button>
+                </div>
             </div>
-            <div className="flex flex-col gap-1 mt-4">
+            <div className="flex flex-col gap-1 p-4">
                 {Q.choices.map((choice: string, index: number) => (
                     <Choice
                         key={choice}
