@@ -1,22 +1,19 @@
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import QuizForm from "../components/quiz-form";
+import { ArrowBigRight, ArrowRight, Clock, List, User } from "lucide-react";
 
-async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
-    const { quizId } = await params;
+export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
+  const { quizId } = await params;
+
     const quiz = await prisma.quiz.findUnique({
         where: {
             id: quizId,
         },
         include: {
-            questions: {
-                select: {
-                    question: true,
-                    choices: true,
-                    id: true,
-                }
-            },
-            creator: true
+            creator: true,
+            questions: true
         }
     });
 
@@ -30,15 +27,58 @@ async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
     }
 
     return (
-        <QuizForm quiz={quiz} />
-    )
-}
-
-export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
-    return (
         <>
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <Quiz params={params} />
+                <div className="flex justify-between items-center p-6 bg-card dark:bg-secondary/25 rounded-md">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-2xl font-bold">{quiz?.title}</h1>
+                        <div className="flex flex-row gap-4">
+                            <span className="flex items-center gap-2 text-sm">
+                                <Clock size={16} />
+                                {quiz?.createdAt.toDateString()}
+                            </span>
+                            <span className="flex items-center gap-2 text-sm">
+                                <User size={16} />
+                                {quiz?.creator?.name}
+                            </span>
+                            <span className="flex items-center gap-2 text-sm">
+                                <List size={16} />
+                                {quiz?.questions.length} questions
+                            </span>
+                        </div>
+                    </div>
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button className="flex gap-2 items-center font-semibold p-4 cursor-pointer">
+                                <ArrowRight size={16} />
+                                Start Quiz
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader
+                                title="Quiz configuration"
+                                description="Configure your quiz as you like before starting."
+                            />
+                            <form>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row gap-2 items-center">
+                                        <input type="checkbox" id="shuffle" className="cursor-pointer" />
+                                        <label htmlFor="shuffle" className="text-sm cursor-pointer">Shuffle questions</label>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end mt-4">
+                                    <Button type="submit" className="font-semibold flex flex-row gap-2 items-center">
+                                        <ArrowRight size={16} />
+                                        Let's go
+                                    </Button>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+                <div className="flex justify-between p-6 bg-card dark:bg-secondary/25 rounded-md mt-6">
+                    <h2>Your previous attempts</h2>
+                </div>
             </div>
         </>
     )

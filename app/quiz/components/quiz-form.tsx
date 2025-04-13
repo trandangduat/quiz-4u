@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import gradeUserChoices from "../[quizId]/action";
+import gradeUserChoices from "../[quizId]/attempt/action";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 
