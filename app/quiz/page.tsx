@@ -32,11 +32,6 @@ async function Quizzes() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Your Quizzes</h1>
-        <p className="text-muted-foreground mt-2">Manage and access all your created quizzes</p>
-      </div>
-
       {createdQuizzes.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed rounded-lg">
           <h2 className="text-xl font-semibold mb-2">No quizzes yet</h2>
@@ -53,8 +48,7 @@ async function Quizzes() {
               quizLink={`/quiz/${quiz.id}`}
               quizInfo={{
                 title: quiz.title,
-                questionCount: quiz.questions.length,
-                createdAt: quiz.createdAt
+                questionCount: quiz.questions.length
               }}
             />
           ))}
