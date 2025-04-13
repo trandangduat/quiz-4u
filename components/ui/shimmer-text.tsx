@@ -22,7 +22,7 @@ const ShimmerText = ({text, shimmerWidth = 100, shimmerDuration = 2000, classNam
             className
         )}
     >
-        <CircleDot size={16} className="animate-pulse" />
+        <LoaderCircle size={16} className="animate-spin" />
         {text}
     </span>
   );
