@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Suspense } from "react";
 import QuizForm from "../components/quiz-form";
 
 async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
@@ -31,27 +30,16 @@ async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
     }
 
     return (
-        <>
-            <h1>{quiz?.title}</h1>
-            <QuizForm quiz={quiz} />
-        </>
-    )
-}
-
-function QuizSkeleton() {
-    return (
-        <>
-            <h1>Loading...</h1>
-        </>
+        <QuizForm quiz={quiz} />
     )
 }
 
 export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
     return (
         <>
-            <Suspense fallback={<QuizSkeleton />}>
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <Quiz params={params} />
-            </Suspense>
+            </div>
         </>
     )
 }
