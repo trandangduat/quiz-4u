@@ -65,34 +65,20 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded, set
     );
 }
 
-function Question ({ Q, userChoices, setUserChoices, answer, questionNumber, scrollToQuestion } :
+function Question ({ Q, userChoices, setUserChoices, answer, questionNumber } :
     {
         Q: any,
         userChoices: Record<string, number>,
         setUserChoices: Dispatch<SetStateAction<Record<string, number>>>,
         answer: { index: number; explanation: string } | undefined,
         questionNumber: number,
-        scrollToQuestion?: () => void
     }
 ) {
-    const questionRef = useRef<HTMLDivElement>(null);
-
-    // Expose the ref for scrolling functionality
-    useEffect(() => {
-        if (scrollToQuestion) {
-            return;
-        }
-    }, [scrollToQuestion]);
 
     return (
         <div
             id={`question-${Q.id}`}
-            ref={questionRef}
-            className={cn(
-                "rounded-lg p-5 bg-white dark:bg-secondary/25",
-                answer !== undefined && answer.index === userChoices[Q.id] && "bg-green-50 dark:bg-green-950/10 border-green-200 dark:border-green-800/30",
-                answer !== undefined && answer.index !== userChoices[Q.id] && "bg-red-50 dark:bg-red-950/10 border-red-200 dark:border-red-800/30",
-            )}
+            className={cn("rounded-lg p-5 bg-white dark:bg-secondary/25")}
         >
             <div className="flex items-center gap-2">
                 <span className="bg-primary/10 text-primary font-medium rounded-full w-7 h-7 flex items-center justify-center">
@@ -141,9 +127,7 @@ export default function QuizForm({ quiz } : { quiz: any }) {
     const [answers, setAnswers] = useState<Record<string, {index: number, explanation: string}>>({});
     const [score, setScore] = useState<{correct: number, total: number} | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const questionsRefs = useRef<Map<string, HTMLElement>>(new Map());
 
-    // Calculate the progress
     const totalQuestions = quiz?.questions?.length || 0;
     const answeredQuestions = Object.keys(userChoices).length;
 
@@ -154,38 +138,8 @@ export default function QuizForm({ quiz } : { quiz: any }) {
         setIsSubmitted(false);
     };
 
-    // Tracking which question is currently visible
-    useEffect(() => {
-        if (!quiz?.questions?.length) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const id = entry.target.id.replace('question-', '');
-                    }
-                });
-            },
-            {
-                threshold: 0.5,
-                rootMargin: '-100px 0px -100px 0px'
-            }
-        );
-
-        const questionElements = document.querySelectorAll('[id^="question-"]');
-        questionElements.forEach(el => {
-            observer.observe(el);
-            const id = el.id.replace('question-', '');
-            questionsRefs.current.set(id, el as HTMLElement);
-        });
-
-        return () => {
-            questionElements.forEach(el => observer.unobserve(el));
-        };
-    }, [quiz?.questions]);
-
     const scrollToQuestion = (questionId: string) => {
-        const element = questionsRefs.current.get(questionId);
+        const element = document.body.querySelector(`#question-${questionId}`);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -193,7 +147,6 @@ export default function QuizForm({ quiz } : { quiz: any }) {
 
     return (
         <div className="flex flex-col md:flex-row gap-6 relative">
-            {/* Main quiz content */}
             <div className="flex-1">
                 <div className="mb-10">
                     <h1 className="text-3xl font-bold">{quiz.title}</h1>
