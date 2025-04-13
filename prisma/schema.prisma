@@ -25,6 +25,7 @@ model User {
   Authenticator Authenticator[]
   quizzes       Quiz[]
   knowledges    Knowledge[]
+  attempts      Attempt[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -94,6 +95,7 @@ model Quiz {
   creator     User?      @relation(fields: [creatorId], references: [id])
   knowledgeId String?
   knowledge   Knowledge? @relation(fields: [knowledgeId], references: [id])
+  attempts    Attempt[]  // Mối quan hệ một-nhiều với Attempt
 }
 
 model Question {
@@ -111,5 +113,17 @@ model Knowledge {
   content   String
   creatorId String?
   creator   User?    @relation(fields: [creatorId], references: [id])
-  quizzes   Quiz[]   
+  quizzes   Quiz[]
+}
+
+model Attempt {
+  id               String   @id @default(uuid())
+  userId           String
+  quizId           String
+  correctedAnswers Int
+  userChoices      Json
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  quiz Quiz @relation(fields: [quizId], references: [id])
 }
