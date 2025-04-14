@@ -2,7 +2,7 @@
 
 import { createContext, ReactNode, useContext, useState } from "react";
 
-const CurrentQuizContext = createContext<{
+const CurrentAttemptContext = createContext<{
   quizId: string;
   setQuizId: (quizId: string) => void;
   userChoices: Record<string, number>;
@@ -22,28 +22,28 @@ const CurrentQuizContext = createContext<{
   setQuizDuration: () => {},
 });
 
-export const CurrentQuizProvider = ({ children } : { children: ReactNode }) => {
+export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) => {
   const [quizId, setQuizId] = useState<string>("");
   const [userChoices, setUserChoices] = useState<Record<string, number>>({});
   const [startTimeUTC, setStartTimeUTC] = useState<number>(-1);
   const [quizDuration, setQuizDuration] = useState<number>(-1);
 
   return (
-    <CurrentQuizContext.Provider value={{
+    <CurrentAttemptContext.Provider value={{
       quizId, setQuizId,
       userChoices, setUserChoices,
       startTimeUTC, setStartTimeUTC,
       quizDuration, setQuizDuration
     }}>
       {children}
-    </CurrentQuizContext.Provider>
+    </CurrentAttemptContext.Provider>
   );
 }
 
-export const useCurrentQuiz = () => {
-  const context = useContext(CurrentQuizContext);
+export const useCurrentAttempt = () => {
+  const context = useContext(CurrentAttemptContext);
   if (!context) {
-    throw new Error("useCurrentQuiz must be used within a CurrentQuizProvider");
+    throw new Error("useCurrentAttempt must be used within a CurrentAttemptProvider");
   }
   return context;
 }
