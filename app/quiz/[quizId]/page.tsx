@@ -1,3 +1,4 @@
+import QuizConfigForm from "@/components/quiz-config-form";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
@@ -59,20 +60,9 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                                 title="Quiz configuration"
                                 description="Configure your quiz as you like before starting."
                             />
-                            <form>
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-row gap-2 items-center">
-                                        <input type="checkbox" id="shuffle" className="cursor-pointer" />
-                                        <label htmlFor="shuffle" className="text-sm cursor-pointer">Shuffle questions</label>
-                                    </div>
-                                </div>
-                                <div className="flex justify-end mt-8">
-                                    <Button type="submit" className="font-semibold flex flex-row gap-2 items-center">
-                                        <ArrowRight size={16} />
-                                        Let's go
-                                    </Button>
-                                </div>
-                            </form>
+                            <QuizConfigForm
+                                quizId={quizId}
+                            />
                         </DialogContent>
                     </Dialog>
                 </div>

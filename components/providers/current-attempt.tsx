@@ -9,7 +9,7 @@ const CurrentAttemptContext = createContext<{
   setUserChoices: (userChoices: Record<string, number>) => void;
   startTimeUTC: number;
   setStartTimeUTC: (startTimeUTC: number) => void;
-  quizDuration: number;
+  quizDuration: number; // in milliseconds
   setQuizDuration: (quizDuration: number) => void;
 }>({
   quizId: "",

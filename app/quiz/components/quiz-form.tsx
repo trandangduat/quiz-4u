@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import gradeUserChoices from "../[quizId]/attempt/action";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useCurrentAttempt } from "@/components/providers/current-attempt";
 
 function RadioButton({ isChosen, isCorrect, isGraded } : { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
     return (
@@ -136,11 +137,62 @@ function Question ({ Q, userChoices, setUserChoices, answer, questionNumber } :
     );
 }
 
+function Clock() {
+    const { startTimeUTC, setStartTimeUTC, quizDuration, setQuizDuration } = useCurrentAttempt();
+    const [minutes, setMinutes] = useState<number>(-1);
+    const [seconds, setSeconds] = useState<number>(-1);
+
+    useEffect(() => {
+        if (startTimeUTC < 0) {
+            setStartTimeUTC(Date.now());
+            return;
+        }
+        if (quizDuration < 0) {
+            return;
+        }
+        const interval = setInterval(() => {
+            const elapsed = Math.max(0, Date.now() - startTimeUTC);
+            const remaining = Math.max(0, quizDuration - elapsed);
+            setMinutes(Math.floor((remaining / 1000 / 60)));
+            setSeconds(Math.floor((remaining / 1000) % 60));
+        }, 500);
+        return () => clearInterval(interval)
+    }, [startTimeUTC, quizDuration]);
+
+    return (
+        <div className="flex items-center gap-2 justify-center">
+            <div className="flex items-center gap-1">
+                {minutes < 0 && seconds < 0 ? (
+                    <span className="text-4xl font-bold">&#8734;</span>
+                ) : (
+                    <>
+                        <span className="text-4xl font-bold">{minutes > 9 ? minutes : `0${minutes}` }</span>
+                        <span className="text-3xl font-bold text-secondary-700">:</span>
+                        <span className="text-4xl font-bold">{seconds > 9 ? seconds : `0${seconds}`}</span>
+                    </>
+                )}
+            </div>
+            {/* <Button
+                onClick={() => {
+                    setStartTimeUTC(Date.now());
+                    setQuizDuration(5 * 60 * 1000);
+                }}
+            >test</Button> */}
+        </div>
+    );
+}
+
 export default function QuizForm({ quiz } : { quiz: any }) {
-    const [userChoices, setUserChoices] = useState<Record<string, number>>({});
     const [answers, setAnswers] = useState<Record<string, {index: number, explanation: string}>>({});
     const [score, setScore] = useState<{correct: number, total: number} | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const {
+        userChoices,
+        setUserChoices,
+        startTimeUTC,
+        quizDuration
+    } = useCurrentAttempt();
 
     const totalQuestions = quiz?.questions?.length || 0;
     const answeredQuestions = Object.keys(userChoices).length;
@@ -272,6 +324,11 @@ export default function QuizForm({ quiz } : { quiz: any }) {
                             </div>
                         )}
                     </div>
+                </div>
+
+                <div className="bg-card dark:bg-secondary/30 backdrop-blur-sm p-4 rounded-lg shadow-sm mt-4">
+                    <h3 className="font-medium mb-3 text-sm">Time remaining</h3>
+                    <Clock />
                 </div>
             </div>
         </div>
