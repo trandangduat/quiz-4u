@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CurrentAttemptProvider } from "@/components/providers/current-attempt";
+import CurrentAttemptToast from "@/components/current-attempt-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
         >
           <CurrentAttemptProvider>
             <NavBar />
+            <CurrentAttemptToast />
             {children}
           </CurrentAttemptProvider>
         </ThemeProvider>

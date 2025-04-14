@@ -62,6 +62,8 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                             />
                             <QuizConfigForm
                                 quizId={quizId}
+                                quizTitle={quiz?.title!}
+                                questionsCount={quiz?.questions.length!}
                             />
                         </DialogContent>
                     </Dialog>

@@ -3,8 +3,9 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 
 const CurrentAttemptContext = createContext<{
-  quizId: string;
-  setQuizId: (quizId: string) => void;
+
+  quiz: { id: string, title: string, questionsCount: number } | null;
+  setQuiz: (quiz: { id: string, title: string, questionsCount: number } | null) => void;
   userChoices: Record<string, number>;
   setUserChoices: (userChoices: Record<string, number>) => void;
   startTimeUTC: number;
@@ -12,8 +13,8 @@ const CurrentAttemptContext = createContext<{
   quizDuration: number; // in milliseconds
   setQuizDuration: (quizDuration: number) => void;
 }>({
-  quizId: "",
-  setQuizId: () => {},
+  quiz: null,
+  setQuiz: () => {},
   userChoices: {},
   setUserChoices: () => {},
   startTimeUTC: -1,
@@ -23,14 +24,14 @@ const CurrentAttemptContext = createContext<{
 });
 
 export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) => {
-  const [quizId, setQuizId] = useState<string>("");
+  const [quiz, setQuiz] = useState<{ id: string, title: string, questionsCount: number } | null>(null);
   const [userChoices, setUserChoices] = useState<Record<string, number>>({});
   const [startTimeUTC, setStartTimeUTC] = useState<number>(-1);
   const [quizDuration, setQuizDuration] = useState<number>(-1);
 
   return (
     <CurrentAttemptContext.Provider value={{
-      quizId, setQuizId,
+      quiz, setQuiz,
       userChoices, setUserChoices,
       startTimeUTC, setStartTimeUTC,
       quizDuration, setQuizDuration

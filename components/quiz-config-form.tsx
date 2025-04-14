@@ -6,7 +6,12 @@ import { use, useState } from "react";
 import { useCurrentAttempt } from "./providers/current-attempt";
 import { useRouter } from "next/navigation";
 
-export default function QuizConfigForm({ quizId }: { quizId: string }) {
+export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
+  {
+    quizId: string;
+    quizTitle: string;
+    questionsCount: number;
+  }) {
   const [shuffle, setShuffle] = useState<boolean>(false);
   const [enableTimeLimit, setEnableTimeLimit] = useState<boolean>(false);
   const [timeLimit, setTimeLimit] = useState<number>(0); // in minutes
@@ -16,7 +21,11 @@ export default function QuizConfigForm({ quizId }: { quizId: string }) {
   const startQuiz = (e: React.FormEvent) => {
     e.preventDefault();
 
-    currentAttempt.setQuizId(quizId);
+    currentAttempt.setQuiz({
+      id: quizId,
+      title: quizTitle,
+      questionsCount: questionsCount,
+    });
     currentAttempt.setUserChoices({});
     currentAttempt.setStartTimeUTC(-1);
     currentAttempt.setQuizDuration(enableTimeLimit ? timeLimit * 60 * 1000 : -1);
