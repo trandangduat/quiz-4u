@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import QuizForm from "../../components/quiz-form";
+import QuizForm from "@/components/quiz-form";
 
 async function Quiz({ params } : { params: Promise<{ quizId: string }> }) {
     const { quizId } = await params;
