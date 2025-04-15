@@ -13,8 +13,8 @@ function RadioButton({ isChosen, isCorrect, isGraded } : { isChosen: boolean, is
             className={cn(
                 "w-4 h-4 rounded-full border-2 border-primary",
                 isChosen && "bg-primary",
-                isChosen && isGraded && !isCorrect && "bg-red-700 border-red-700",
-                isGraded && isCorrect && "bg-green-700 border-green-700",
+                isGraded && isChosen && isCorrect && "bg-green-700 border-green-700 dark:bg-green-300 dark:border-green-300",
+                isGraded && isChosen && !isCorrect && "bg-red-700 border-red-700 dark:bg-red-400 dark:border-red-400",
             )}
         >
         </div>
