@@ -5,6 +5,7 @@ import { useCurrentAttempt } from "./providers/current-attempt";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useParams, usePathname } from "next/navigation";
 
 export default function CurrentAttemptToast() {
     const {
@@ -16,6 +17,7 @@ export default function CurrentAttemptToast() {
     const [minutes, setMinutes] = useState<number>(-1);
     const [seconds, setSeconds] = useState<number>(-1);
     const answeredCount = Object.keys(userChoices).filter(key => userChoices[key] !== undefined).length;
+    const pathname = usePathname();
 
     useEffect(() => {
         if (startTimeUTC < 0 || quizDuration < 0) {
@@ -30,13 +32,13 @@ export default function CurrentAttemptToast() {
         return () => clearInterval(interval)
     }, [startTimeUTC, quizDuration]);
 
-    // if (!quizId) {
-    //     return null;
-    // }
+    if (!quiz || !quiz.id || startTimeUTC < 0 || pathname === `/quiz/${quiz.id}/attempt`) {
+        return null;
+    }
 
     return (
         <Link href={`/quiz/${quiz?.id}/attempt`}>
-            <div className="fixed bottom-6 right-6 w-full max-w-md mx-auto z-50">
+            <div className="fixed bottom-6 right-6 w-full max-w-md mx-auto z-50 animate-[slide-in-bottom_250ms]">
                 <div className={cn(
                     "bg-primary rounded-md p-6 h-full relative",
                     "hover:scale-103 transition-all duration-200",

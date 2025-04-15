@@ -28,6 +28,15 @@
     }
   }
 
+  @keyframes slide-in-bottom {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
 }
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
@@ -242,7 +251,7 @@
   --destructive-200: oklch(84% 0.085 24.60);
   --destructive-300: oklch(76% 0.105 24.40);
   --destructive-400: oklch(68% 0.140 24.20);
-  --destructive-500: oklch(60% 0.18 24.00);  
+  --destructive-500: oklch(60% 0.18 24.00);
   --destructive-600: oklch(50% 0.16 23.80);
   --destructive-700: oklch(40% 0.13 23.60);
   --destructive-800: oklch(30% 0.10 23.40);
@@ -350,7 +359,7 @@
   --destructive-200: oklch(30% 0.10 23.40);
   --destructive-300: oklch(40% 0.13 23.60);
   --destructive-400: oklch(50% 0.16 23.80);
-  --destructive-500: oklch(60% 0.18 24.00);  
+  --destructive-500: oklch(60% 0.18 24.00);
   --destructive-600: oklch(68% 0.20 24.00);
   --destructive-700: oklch(76% 0.17 24.20);
   --destructive-800: oklch(84% 0.14 24.40);
@@ -375,8 +384,8 @@
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--color-secondary-200); /* Tailwind blue-500 */
     border-radius: 9999px;
-  } 
+  }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-secondary-300); /* Tailwind blue-500 */
-  } 
+  }
 }
