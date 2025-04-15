@@ -195,7 +195,7 @@ export default function QuizForm({ quiz } : { quiz: any }) {
     } = useCurrentAttempt();
 
     const totalQuestions = quiz?.questions?.length || 0;
-    const answeredQuestions = Object.keys(userChoices).length;
+    const answeredQuestions = Object.keys(userChoices).filter(key => userChoices[key] !== undefined).length;
 
     const handleResetQuiz = () => {
         setUserChoices({});

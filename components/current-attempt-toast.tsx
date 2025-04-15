@@ -13,7 +13,7 @@ export default function CurrentAttemptToast() {
     } = useCurrentAttempt();
     const [minutes, setMinutes] = useState<number>(-1);
     const [seconds, setSeconds] = useState<number>(-1);
-    const answeredCount = Object.keys(userChoices).length;
+    const answeredCount = Object.keys(userChoices).filter(key => userChoices[key] !== undefined).length;
 
     useEffect(() => {
         if (startTimeUTC < 0 || quizDuration < 0) {
