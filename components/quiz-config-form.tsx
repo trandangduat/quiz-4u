@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, LoaderCircle } from "lucide-react"
 import { Button } from "./ui/button"
 import { use, useState } from "react";
 import { useCurrentAttempt } from "./providers/current-attempt";
@@ -15,11 +15,14 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
   const [shuffle, setShuffle] = useState<boolean>(false);
   const [enableTimeLimit, setEnableTimeLimit] = useState<boolean>(false);
   const [timeLimit, setTimeLimit] = useState<number>(0); // in minutes
+  const [loading, setLoading] = useState<boolean>(false);
+
   const currentAttempt = useCurrentAttempt();
   const router = useRouter();
 
   const startQuiz = (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     currentAttempt.setQuiz({
       id: quizId,
@@ -69,8 +72,9 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
             type="submit"
             className="font-semibold flex flex-row gap-2 items-center cursor-pointer"
             onClick={startQuiz}
+            disabled={loading}
           >
-              <ArrowRight size={16} />
+            {loading ? <LoaderCircle size={16} className="animate-spin" /> : <ArrowRight size={16} /> }
               Let's go
           </Button>
       </div>
