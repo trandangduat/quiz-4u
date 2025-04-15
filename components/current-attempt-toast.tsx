@@ -3,6 +3,8 @@
 import { ClockAlert } from "lucide-react";
 import { useCurrentAttempt } from "./providers/current-attempt";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function CurrentAttemptToast() {
     const {
@@ -33,39 +35,45 @@ export default function CurrentAttemptToast() {
     // }
 
     return (
-        <div className="fixed bottom-6 right-6 w-full max-w-md mx-auto z-50">
-            <div className="bg-linear-to-r from-primary to-secondary-500 rounded-md p-6 h-full relative">
-                <div className="flex flex-row justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        <div className="text-background">
-                            <ClockAlert size={48} />
-                        </div>
-                        <div className="flex flex-col items-start">
-                            <div>
-                                <span className="font-bold text-lg text-background">
-                                    {quiz?.title}
-                                </span>
+        <Link href={`/quiz/${quiz?.id}/attempt`}>
+            <div className="fixed bottom-6 right-6 w-full max-w-md mx-auto z-50">
+                <div className={cn(
+                    "bg-primary rounded-md p-6 h-full relative",
+                    "hover:scale-103 transition-all duration-200",
+                    "active:scale-100",
+                )}>
+                    <div className="flex flex-row justify-between items-center">
+                        <div className="flex items-center gap-4">
+                            <div className="text-background">
+                                <ClockAlert size={48} />
                             </div>
-                            <div className="flex flex-wrap gap-2 font-medium">
-                                <div className="inline-block text-sm text-background">
-                                    <span>{answeredCount}/{quiz?.questionsCount} answered</span>
+                            <div className="flex flex-col items-start">
+                                <div className="overflow-x-clip text-ellipsis text-background whitespace-nowrap max-w-[210px]">
+                                    <span className="font-bold text-lg w-full">
+                                        {quiz?.title}
+                                    </span>
+                                </div>
+                                <div className="flex flex-wrap gap-2 font-medium">
+                                    <div className="inline-block text-sm text-background">
+                                        <span>{answeredCount}/{quiz?.questionsCount} answered</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="flex items-center gap-1 text-background">
-                        {minutes < 0 && seconds < 0 ? (
-                            <span className="text-4xl font-bold">&#8734;</span>
-                        ) : (
-                            <>
-                                <span className="text-4xl font-bold">{minutes > 9 ? minutes : `0${minutes}` }</span>
-                                <span className="text-3xl font-bold">:</span>
-                                <span className="text-4xl font-bold">{seconds > 9 ? seconds : `0${seconds}`}</span>
-                            </>
-                        )}
+                        <div className="flex items-center text-background font-mono">
+                            {minutes < 0 && seconds < 0 ? (
+                                <span className="text-4xl font-bold">&#8734;</span>
+                            ) : (
+                                <>
+                                    <span className="text-4xl font-bold">{minutes > 9 ? minutes : `0${minutes}` }</span>
+                                    <span className="text-3xl font-bold">:</span>
+                                    <span className="text-4xl font-bold">{seconds > 9 ? seconds : `0${seconds}`}</span>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
