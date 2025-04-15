@@ -1,17 +1,17 @@
 "use client"
 
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
 const CurrentAttemptContext = createContext<{
 
   quiz: { id: string, title: string, questionsCount: number } | null;
   setQuiz: (quiz: { id: string, title: string, questionsCount: number } | null) => void;
   userChoices: Record<string, number>;
-  setUserChoices: (userChoices: Record<string, number>) => void;
+  setUserChoices: Dispatch<SetStateAction<Record<string, number>>>;
   startTimeUTC: number;
-  setStartTimeUTC: (startTimeUTC: number) => void;
+  setStartTimeUTC: Dispatch<SetStateAction<number>>;
   quizDuration: number; // in milliseconds
-  setQuizDuration: (quizDuration: number) => void;
+  setQuizDuration: Dispatch<SetStateAction<number>>;
 }>({
   quiz: null,
   setQuiz: () => {},

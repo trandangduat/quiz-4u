@@ -21,24 +21,28 @@ function RadioButton({ isChosen, isCorrect, isGraded } : { isChosen: boolean, is
     );
 }
 
-function Choice({ content, index, questionId, isChosen, isCorrect, isGraded, setUserChoices } :
+function Choice({ content, index, questionId, isChosen, isCorrect, isGraded } :
     {
         content: string,
         index: number,
         questionId: number,
         isChosen: boolean,
         isCorrect: boolean,
-        isGraded: boolean,
-        setUserChoices: Dispatch<SetStateAction<Record<string, number>>>
+        isGraded: boolean
     }
 ) {
+
+    const { setUserChoices } = useCurrentAttempt();
 
     function updateUserAnswer() {
         if (isGraded) {
             return;
         }
-        setUserChoices(prevChoices => {
-            return { ...prevChoices, [questionId]: index };
+        setUserChoices((prevChoices) => {
+            return {
+                ...prevChoices,
+                [questionId]: index
+            };
         });
     }
 
@@ -66,15 +70,15 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded, set
     );
 }
 
-function Question ({ Q, userChoices, setUserChoices, answer, questionNumber } :
+function Question ({ Q, answer, questionNumber } :
     {
         Q: any,
-        userChoices: Record<string, number>,
-        setUserChoices: Dispatch<SetStateAction<Record<string, number>>>,
         answer: { index: number; explanation: string } | undefined,
         questionNumber: number,
     }
 ) {
+
+    const { userChoices, setUserChoices } = useCurrentAttempt();
 
     return (
         <div
@@ -92,7 +96,7 @@ function Question ({ Q, userChoices, setUserChoices, answer, questionNumber } :
                     <Button
                         variant="soft"
                         className="p-2 rounded-full hover:bg-secondary/50"
-                        onClick={() => setUserChoices({ ...userChoices, [Q.id]: undefined })}
+                        onClick={() => setUserChoices((prevChoices) => ({ ...prevChoices, [Q.id]: undefined }))}
                         aria-label="Reset answer"
                         disabled={userChoices[Q.id] === undefined || answer !== undefined}
                     >
@@ -106,7 +110,6 @@ function Question ({ Q, userChoices, setUserChoices, answer, questionNumber } :
                     <Choice
                         key={choice}
                         questionId={Q.id}
-                        setUserChoices={setUserChoices}
                         content={choice}
                         index={index}
                         isChosen={userChoices[Q.id] === index}
@@ -190,8 +193,6 @@ export default function QuizForm({ quiz } : { quiz: any }) {
     const {
         userChoices,
         setUserChoices,
-        startTimeUTC,
-        quizDuration
     } = useCurrentAttempt();
 
     const totalQuestions = quiz?.questions?.length || 0;
@@ -223,8 +224,6 @@ export default function QuizForm({ quiz } : { quiz: any }) {
                         <Question
                             Q={Q}
                             key={Q.id}
-                            userChoices={userChoices}
-                            setUserChoices={setUserChoices}
                             answer={answers[Q.id]}
                             questionNumber={index + 1}
                         />
