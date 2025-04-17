@@ -1,9 +1,8 @@
 "use client"
 
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
 
 const CurrentAttemptContext = createContext<{
-
   quiz: { id: string, title: string, questionsCount: number } | null;
   setQuiz: (quiz: { id: string, title: string, questionsCount: number } | null) => void;
   userChoices: Record<string, number>;
@@ -24,10 +23,82 @@ const CurrentAttemptContext = createContext<{
 });
 
 export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) => {
+  const [attemptId, setAttemptId] = useState<string | null>(null);
   const [quiz, setQuiz] = useState<{ id: string, title: string, questionsCount: number } | null>(null);
   const [userChoices, setUserChoices] = useState<Record<string, number>>({});
   const [startTimeUTC, setStartTimeUTC] = useState<number>(-1);
   const [quizDuration, setQuizDuration] = useState<number>(-1);
+
+  useEffect(() => {
+    if (attemptId) {
+      return;
+    }
+    // check if there's already an attempt ongoing in database
+    const checkExistingAttempt = async () => {
+      const response = await fetch("/api/attempt/check-ongoing");
+      const data = (await response.json())[0];
+      console.log(data);
+      if (data.id) {
+        setAttemptId(data.id);
+        setQuiz({
+          id: data.quizId,
+          title: data.quizTitle,
+          questionsCount: data.questionsCount
+        });
+        setUserChoices(data.userChoices);
+        setStartTimeUTC(new Date(data.quizStartTime).getTime());
+        setQuizDuration(data.quizDuration);
+      }
+    };
+    checkExistingAttempt();
+  }, [])
+
+  useEffect(() => {
+    if (!quiz || startTimeUTC < 0) {
+      return;
+    }
+
+    const updateAttempt = async() => {
+      console.log("update attempt ", attemptId);
+
+      const result = await fetch("/api/attempt/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          attemptId,
+          userChoices,
+        })
+      });
+    }
+
+    const saveAttempt = async() => {
+      console.log("create attempt ", quiz?.id, quizDuration, startTimeUTC);
+
+      const result = await fetch("/api/attempt/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          quizId: quiz?.id,
+          quizDuration,
+          quizStartTime: new Date(startTimeUTC)
+        })
+      });
+
+      const attempt = await result.json();
+      setAttemptId(attempt.id);
+    }
+
+    if (!attemptId) {
+      saveAttempt();
+    } else {
+      updateAttempt()
+    }
+
+  }, [quiz, userChoices, startTimeUTC, quizDuration]);
 
   return (
     <CurrentAttemptContext.Provider value={{

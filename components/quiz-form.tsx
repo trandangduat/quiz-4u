@@ -141,11 +141,12 @@ function Question ({ Q, answer, questionNumber } :
 }
 
 function Clock() {
-    const { startTimeUTC, setStartTimeUTC, quizDuration, setQuizDuration } = useCurrentAttempt();
+    const { startTimeUTC, setStartTimeUTC, quizDuration } = useCurrentAttempt();
     const [minutes, setMinutes] = useState<number>(-1);
     const [seconds, setSeconds] = useState<number>(-1);
 
     useEffect(() => {
+        // only update quiz start time when clock component is mounted
         if (startTimeUTC < 0) {
             setStartTimeUTC(Date.now());
             return;
