@@ -37,8 +37,7 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
     const checkExistingAttempt = async () => {
       const response = await fetch("/api/attempt/check-ongoing");
       const data = (await response.json())[0];
-      console.log(data);
-      if (data.id) {
+      if (data !== undefined) {
         setAttemptId(data.id);
         setQuiz({
           id: data.quizId,
