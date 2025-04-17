@@ -122,7 +122,8 @@ model Attempt {
   quizId           String
   correctedAnswers Int
   userChoices      Json
-  createdAt        DateTime @default(now())
+  quizDuration     Int
+  quizStartTime    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
   quiz Quiz @relation(fields: [quizId], references: [id])
