@@ -23,12 +23,15 @@ export default function CurrentAttemptToast() {
         if (startTimeUTC < 0 || quizDuration < 0) {
             return;
         }
-        const interval = setInterval(() => {
+        const setTime = () => {
             const elapsed = Math.max(0, Date.now() - startTimeUTC);
             const remaining = Math.max(0, quizDuration - elapsed);
             setMinutes(Math.floor((remaining / 1000 / 60)));
             setSeconds(Math.floor((remaining / 1000) % 60));
-        }, 500);
+        };
+        setTime();
+        const interval = setInterval(setTime, 500);
+
         return () => clearInterval(interval)
     }, [startTimeUTC, quizDuration]);
 

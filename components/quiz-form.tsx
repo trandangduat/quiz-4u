@@ -154,18 +154,21 @@ function Clock() {
         if (quizDuration < 0) {
             return;
         }
-        const interval = setInterval(() => {
+        const setTime = () => {
             const elapsed = Math.max(0, Date.now() - startTimeUTC);
             const remaining = Math.max(0, quizDuration - elapsed);
             setMinutes(Math.floor((remaining / 1000 / 60)));
             setSeconds(Math.floor((remaining / 1000) % 60));
-        }, 500);
+        };
+        setTime();
+        const interval = setInterval(setTime, 500);
+
         return () => clearInterval(interval)
     }, [startTimeUTC, quizDuration]);
 
     return (
         <div className="flex items-center gap-2 justify-center">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 font-mono">
                 {minutes < 0 && seconds < 0 ? (
                     <span className="text-4xl font-bold">&#8734;</span>
                 ) : (
