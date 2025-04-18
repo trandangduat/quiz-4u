@@ -22,6 +22,7 @@ export async function GET() {
       FROM "Attempt"
       JOIN "Quiz" ON "Quiz"."id" = "Attempt"."quizId"
       WHERE "userId" = ${session?.user?.id}
+        AND "isSubmitted" = FALSE
         AND "quizStartTime" + INTERVAL '1 millisecond' * "quizDuration" > NOW()
     `;
 
