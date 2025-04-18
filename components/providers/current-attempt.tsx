@@ -11,6 +11,8 @@ const CurrentAttemptContext = createContext<{
   setStartTimeUTC: Dispatch<SetStateAction<number>>;
   quizDuration: number; // in milliseconds
   setQuizDuration: Dispatch<SetStateAction<number>>;
+  attemptId: string | null;
+  setAttemptId: Dispatch<SetStateAction<string | null>>;
 }>({
   quiz: null,
   setQuiz: () => {},
@@ -20,6 +22,8 @@ const CurrentAttemptContext = createContext<{
   setStartTimeUTC: () => {},
   quizDuration: -1,
   setQuizDuration: () => {},
+  attemptId: null,
+  setAttemptId: () => {},
 });
 
 export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) => {
@@ -104,7 +108,8 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
       quiz, setQuiz,
       userChoices, setUserChoices,
       startTimeUTC, setStartTimeUTC,
-      quizDuration, setQuizDuration
+      quizDuration, setQuizDuration,
+      attemptId, setAttemptId
     }}>
       {children}
     </CurrentAttemptContext.Provider>

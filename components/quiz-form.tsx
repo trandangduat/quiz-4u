@@ -2,10 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import gradeUserChoices from "../app/quiz/[quizId]/attempt/action";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useCurrentAttempt } from "@/components/providers/current-attempt";
+import { usePathname, useRouter } from "next/navigation";
 
 function RadioButton({ isChosen, isCorrect, isGraded } : { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
     return (
@@ -70,15 +70,17 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded } :
     );
 }
 
-function Question ({ Q, answer, questionNumber } :
+function Question ({ Q, answer, questionNumber, userChoice, isSubmitted } :
     {
         Q: any,
         answer: { index: number; explanation: string } | undefined,
         questionNumber: number,
+        userChoice?: number | null,
+        isSubmitted: boolean,
     }
 ) {
 
-    const { userChoices, setUserChoices } = useCurrentAttempt();
+    const {setUserChoices } = useCurrentAttempt();
 
     return (
         <div
@@ -92,18 +94,20 @@ function Question ({ Q, answer, questionNumber } :
                     </span>
                     <p className="font-semibold">{Q.question}</p>
                 </div>
-                <div className="">
-                    <Button
-                        variant="soft"
-                        className="p-2 rounded-full hover:bg-secondary/50"
-                        onClick={() => setUserChoices((prevChoices) => ({ ...prevChoices, [Q.id]: undefined }))}
-                        aria-label="Reset answer"
-                        disabled={userChoices[Q.id] === undefined || answer !== undefined}
-                    >
-                        <X size={16} />
-                        Reset answer
-                    </Button>
-                </div>
+                {!isSubmitted && (
+                    <div className="">
+                        <Button
+                            variant="soft"
+                            className="p-2 rounded-full hover:bg-secondary/50"
+                            onClick={() => setUserChoices((prevChoices) => ({ ...prevChoices, [Q.id]: undefined }))}
+                            aria-label="Reset answer"
+                            disabled={userChoice === undefined || answer !== undefined}
+                        >
+                            <X size={16} />
+                            Reset answer
+                        </Button>
+                    </div>
+                )}
             </div>
             <div className="flex flex-col gap-1 p-4">
                 {Q.choices.map((choice: string, index: number) => (
@@ -112,7 +116,7 @@ function Question ({ Q, answer, questionNumber } :
                         questionId={Q.id}
                         content={choice}
                         index={index}
-                        isChosen={userChoices[Q.id] === index}
+                        isChosen={userChoice === index}
                         isCorrect={answer?.index === index}
                         isGraded={answer !== undefined}
                     />
@@ -122,9 +126,9 @@ function Question ({ Q, answer, questionNumber } :
                     <div className="mt-2">
                         <div className={cn(
                             "flex items-center gap-2 mb-1 font-medium",
-                            answer.index === userChoices[Q.id] ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                            answer.index === userChoice ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
                         )}>
-                            {answer.index === userChoices[Q.id] ? (
+                            {answer.index === userChoice ? (
                                 <><Check size={18} />Correct</>
                             ) : (
                                 <><X size={18} />Incorrect</>
@@ -189,24 +193,44 @@ function Clock() {
     );
 }
 
-export default function QuizForm({ quiz } : { quiz: any }) {
-    const [answers, setAnswers] = useState<Record<string, {index: number, explanation: string}>>({});
-    const [score, setScore] = useState<{correct: number, total: number} | null>(null);
-    const [isSubmitted, setIsSubmitted] = useState(false);
-
-    const {
-        userChoices,
-        setUserChoices,
-    } = useCurrentAttempt();
-
+export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }) {
+    const answers: Record<string, {index: number, explanation: string}> = {};
+    const isSubmitted: boolean = attempt?.isSubmitted || false;
+    const router = useRouter();
+    const currentAttempt = useCurrentAttempt();
+    const userChoices: Record<string, number> = (isSubmitted ? attempt.userChoices : currentAttempt.userChoices);
     const totalQuestions = quiz?.questions?.length || 0;
     const answeredQuestions = Object.keys(userChoices).filter(key => userChoices[key] !== undefined).length;
+    let score: number = 0;
+    const pathname = usePathname();
 
-    const handleResetQuiz = () => {
-        setUserChoices({});
-        setAnswers({});
-        setScore(null);
-        setIsSubmitted(false);
+    if (isSubmitted) {
+        for (const Q of quiz?.questions) {
+            if (Q.answer !== undefined) {
+                answers[Q.id] = {
+                    index: Q.answer,
+                    explanation: Q.explanation
+                };
+                score += (Q.answer === userChoices[Q.id] ? 1 : 0);
+            }
+        }
+    }
+
+    console.log("quia", quiz?.questions)
+    console.log("answers", answers)
+    console.log("user choices", userChoices)
+
+    const resetCurrentAttempt = () => {
+        currentAttempt.setQuiz(null);
+        currentAttempt.setStartTimeUTC(-1);
+        currentAttempt.setQuizDuration(-1);
+        currentAttempt.setUserChoices({});
+        currentAttempt.setAttemptId(null);
+    };
+
+    const handleSubmitQuizAttempt = () => {
+        resetCurrentAttempt();
+        router.push(`${pathname}/${currentAttempt.attemptId}`);
     };
 
     const scrollToQuestion = (questionId: string) => {
@@ -230,36 +254,16 @@ export default function QuizForm({ quiz } : { quiz: any }) {
                             key={Q.id}
                             answer={answers[Q.id]}
                             questionNumber={index + 1}
+                            userChoice={userChoices[Q.id]}
+                            isSubmitted={isSubmitted}
                         />
                     ))}
 
                     <div className="flex gap-3">
                         {!isSubmitted ? (
                             <Button
-                                className="p-4 text-lg"
-                                onClick={async () => {
-                                    setIsSubmitted(true);
-                                    const quizAns = await gradeUserChoices(quiz.id, userChoices);
-                                    let correctChoices: Record<string, {index: number, explanation: string}> = {};
-                                    let correctCount = 0;
-
-                                    quizAns?.questions.forEach((question) => {
-                                        correctChoices[question.id] = {
-                                            index: question.answer,
-                                            explanation: question.explanation
-                                        };
-
-                                        if (userChoices[question.id] === question.answer) {
-                                            correctCount++;
-                                        }
-                                    });
-
-                                    setAnswers(correctChoices);
-                                    setScore({
-                                        correct: correctCount,
-                                        total: quizAns?.questions.length || 0
-                                    });
-                                }}
+                                className="p-4"
+                                onClick={handleSubmitQuizAttempt}
                                 disabled={answeredQuestions === 0}
                             >
                                 Submit Quiz
@@ -267,10 +271,9 @@ export default function QuizForm({ quiz } : { quiz: any }) {
                         ) : (
                             <Button
                                 variant="soft"
-                                className="p-4 text-lg"
-                                onClick={handleResetQuiz}
+                                className="p-4"
                             >
-                                Try Again
+                                Go back to quiz section
                             </Button>
                         )}
                     </div>
@@ -286,6 +289,8 @@ export default function QuizForm({ quiz } : { quiz: any }) {
                             const isAnswered = userChoices[Q.id] !== undefined;
                             const isCorrect = answers[Q.id] !== undefined && answers[Q.id].index === userChoices[Q.id];
                             const isIncorrect = answers[Q.id] !== undefined && answers[Q.id].index !== userChoices[Q.id];
+
+                            console.log(index + 1, isAnswered, isCorrect, isIncorrect, answers[Q.id])
 
                             return (
                                 <button
@@ -313,26 +318,25 @@ export default function QuizForm({ quiz } : { quiz: any }) {
                             <span className="font-medium">{answeredQuestions}/{totalQuestions}</span>
                         </div>
 
-                        {isSubmitted && score && (
+                        {isSubmitted && (
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Score:</span>
                                 <span className={cn(
                                     "font-medium",
-                                    score.correct === score.total ? "text-green-600 dark:text-green-400" :
-                                    score.correct >= score.total / 2 ? "text-yellow-600 dark:text-yellow-400" :
-                                    "text-red-600 dark:text-red-400"
                                 )}>
-                                    {score.correct}/{score.total}
+                                    {score}/{quiz?.questions.length}
                                 </span>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className="bg-card dark:bg-secondary/30 backdrop-blur-sm p-4 rounded-lg shadow-sm mt-4">
-                    <h3 className="font-medium mb-3 text-sm">Time remaining</h3>
-                    <Clock />
-                </div>
+                {!isSubmitted && (
+                    <div className="bg-card dark:bg-secondary/30 backdrop-blur-sm p-4 rounded-lg shadow-sm mt-4">
+                        <h3 className="font-medium mb-3 text-sm">Time remaining</h3>
+                        <Clock />
+                    </div>
+                )}
             </div>
         </div>
     );

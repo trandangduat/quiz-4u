@@ -124,6 +124,7 @@ model Attempt {
   userChoices      Json
   quizDuration     Int
   quizStartTime    DateTime @default(now())
+  isSubmitted      Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id])
   quiz Quiz @relation(fields: [quizId], references: [id])
