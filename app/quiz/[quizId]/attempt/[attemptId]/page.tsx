@@ -1,6 +1,7 @@
 import QuizForm from "@/components/quiz-form";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Attempt } from "@prisma/client";
 
 export default async function Page({ params } : { params: Promise<{ quizId: string, attemptId: string }> }) {
     const { quizId, attemptId } = await params;
@@ -32,17 +33,32 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
         }
     });
 
-    let attempt = null;
+    let attempt: (Attempt | null) = null;
 
     try {
-        attempt = await prisma.attempt.update({
+        attempt = await prisma.attempt.findUniqueOrThrow({
             where: {
                 id: attemptId,
-            },
-            data: {
-                isSubmitted: true,
             }
         });
+        if (!attempt.isSubmitted) {
+            let countCorrect: number = 0;
+            for (const Q of quiz?.questions!) {
+                if (Q.answer !== undefined) {
+                    let userChoice: number = attempt.userChoices[Q.id];
+                    countCorrect += (Q.answer === userChoice ? 1 : 0);
+                }
+            }
+            attempt = await prisma.attempt.update({
+                where: {
+                    id: attemptId,
+                },
+                data: {
+                    isSubmitted: true,
+                    correctedAnswers: countCorrect
+                }
+            });
+        }
     } catch(e) {
         return (
             <>
