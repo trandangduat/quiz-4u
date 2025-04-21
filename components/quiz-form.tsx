@@ -3,11 +3,11 @@
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, MessageCircleWarning, X } from "lucide-react";
 import { useCurrentAttempt } from "@/components/providers/current-attempt";
 import { usePathname, useRouter } from "next/navigation";
 
-function RadioButton({ isChosen, isCorrect, isGraded } : { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
+function RadioButton({ isChosen, isCorrect, isGraded }: { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
     return (
         <div
             className={cn(
@@ -21,7 +21,7 @@ function RadioButton({ isChosen, isCorrect, isGraded } : { isChosen: boolean, is
     );
 }
 
-function Choice({ content, index, questionId, isChosen, isCorrect, isGraded } :
+function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
     {
         content: string,
         index: number,
@@ -70,7 +70,7 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded } :
     );
 }
 
-function Question ({ Q, answer, questionNumber, userChoice, isSubmitted } :
+function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
     {
         Q: any,
         answer: { index: number; explanation: string } | undefined,
@@ -80,7 +80,7 @@ function Question ({ Q, answer, questionNumber, userChoice, isSubmitted } :
     }
 ) {
 
-    const {setUserChoices } = useCurrentAttempt();
+    const { setUserChoices } = useCurrentAttempt();
 
     return (
         <div
@@ -108,6 +108,18 @@ function Question ({ Q, answer, questionNumber, userChoice, isSubmitted } :
                         </Button>
                     </div>
                 )}
+                {answer && (
+                    <div className={cn(
+                        "flex items-center gap-2 mb-1 font-medium",
+                        answer.index === userChoice ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                    )}>
+                        {answer.index === userChoice ? (
+                            <><Check size={18} />Correct</>
+                        ) : (
+                            <><X size={18} />Incorrect</>
+                        )}
+                    </div>
+                )}
             </div>
             <div className="flex flex-col gap-1 p-4">
                 {Q.choices.map((choice: string, index: number) => (
@@ -123,18 +135,11 @@ function Question ({ Q, answer, questionNumber, userChoice, isSubmitted } :
                 ))}
 
                 {answer && (
-                    <div className="mt-2">
-                        <div className={cn(
-                            "flex items-center gap-2 mb-1 font-medium",
-                            answer.index === userChoice ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-                        )}>
-                            {answer.index === userChoice ? (
-                                <><Check size={18} />Correct</>
-                            ) : (
-                                <><X size={18} />Incorrect</>
-                            )}
+                    <div className="mt-2 italic text-sm bg-primary/10 p-3 rounded-md flex items-center gap-4">
+                        <div className="bg-primary/8 rounded-md p-2">
+                            <MessageCircleWarning size={32} strokeWidth={1} />
                         </div>
-                        <p className="italic text-sm bg-primary/5 p-3 rounded-md border">
+                        <p className="">
                             {answer.explanation}
                         </p>
                     </div>
@@ -177,24 +182,18 @@ function Clock() {
                     <span className="text-4xl font-bold">&#8734;</span>
                 ) : (
                     <>
-                        <span className="text-4xl font-bold">{minutes > 9 ? minutes : `0${minutes}` }</span>
+                        <span className="text-4xl font-bold">{minutes > 9 ? minutes : `0${minutes}`}</span>
                         <span className="text-3xl font-bold text-secondary-700">:</span>
                         <span className="text-4xl font-bold">{seconds > 9 ? seconds : `0${seconds}`}</span>
                     </>
                 )}
             </div>
-            {/* <Button
-                onClick={() => {
-                    setStartTimeUTC(Date.now());
-                    setQuizDuration(5 * 60 * 1000);
-                }}
-            >test</Button> */}
         </div>
     );
 }
 
 export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }) {
-    const answers: Record<string, {index: number, explanation: string}> = {};
+    const answers: Record<string, { index: number, explanation: string }> = {};
     const isSubmitted: boolean = attempt?.isSubmitted || false;
     const router = useRouter();
     const currentAttempt = useCurrentAttempt();
@@ -215,10 +214,6 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
             }
         }
     }
-
-    console.log("quia", quiz?.questions)
-    console.log("answers", answers)
-    console.log("user choices", userChoices)
 
     const resetCurrentAttempt = () => {
         currentAttempt.setQuiz(null);
@@ -317,20 +312,52 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                             <span className="text-muted-foreground">Answered:</span>
                             <span className="font-medium">{answeredQuestions}/{totalQuestions}</span>
                         </div>
-
-                        {isSubmitted && (
-                            <div className="flex justify-between">
-                                <span className="text-muted-foreground">Score:</span>
-                                <span className={cn(
-                                    "font-medium",
-                                )}>
-                                    {score}/{quiz?.questions.length}
-                                </span>
-                            </div>
-                        )}
                     </div>
                 </div>
-
+                {isSubmitted && (
+                    <div className="bg-card dark:bg-secondary/30 backdrop-blur-sm p-4 rounded-lg shadow-sm mt-4">
+                        <h3 className="font-medium mb-3 text-sm">Score</h3>
+                        <div className="flex items-center justify-center">
+                            <div className="relative w-24 h-24 flex items-center justify-center">
+                                <svg className="w-full h-full" viewBox="0 0 36 36">
+                                    <circle 
+                                        cx="18" 
+                                        cy="18" 
+                                        r="15.91549430918954"
+                                        fill="transparent"
+                                        stroke="#e6e6e6"
+                                        strokeWidth="2"
+                                        className="dark:stroke-secondary/50"
+                                    />
+                                    
+                                    <circle 
+                                        cx="18" 
+                                        cy="18" 
+                                        r="15.91549430918954" 
+                                        fill="transparent"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeDasharray={`${(score / quiz?.questions.length) * 100} 100`}
+                                        strokeDashoffset="25"
+                                        className={cn(
+                                            "transition-all duration-1000 ease-in-out",
+                                            score === 0 ? "text-red-500" : 
+                                            score < quiz?.questions.length / 2 ? "text-amber-500" : 
+                                            score === quiz?.questions.length ? "text-green-500" : "text-blue-500"
+                                        )}
+                                    />
+                                </svg>
+                                {/* Score text */}
+                                <div className="absolute flex flex-col items-center justify-center">
+                                    <span className="text-2xl font-bold">{score}/{quiz?.questions.length}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        {Math.round((score / quiz?.questions.length) * 100)}%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {!isSubmitted && (
                     <div className="bg-card dark:bg-secondary/30 backdrop-blur-sm p-4 rounded-lg shadow-sm mt-4">
                         <h3 className="font-medium mb-3 text-sm">Time remaining</h3>
