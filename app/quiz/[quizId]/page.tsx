@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, List, MoveUpRight, SquareArrowUpRight, User } from "lucide-react";
+import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, Clock1, List, MoveUpRight, SquareArrowUpRight, Timer, User } from "lucide-react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
     const { quizId } = await params;
@@ -85,22 +88,23 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                 </div>
                 <div className="p-6 bg-card dark:bg-secondary/25 rounded-md mt-6">
                     <h2>Your previous attempts</h2>
-                    <div>
+                    <div className="bg-secondary/15 px-4 rounded-md flex flex-col mt-4 divide-y-1 divide-secondary/50">
                         {attempts.map(attempt => (
-                            <div 
+                            <div
                                 key={attempt.id}
-                                className="flex flex-col gap-2 p-4 bg-secondary/25 rounded-md mt-4"
+                                className="py-4"
                             >
                                 <div className="flex flex-row w-full justify-between items-center">
-                                    <div>
+                                    <div className="flex flex-row items-center gap-1 flex-1">
+                                        <Timer size={16} />
+                                        <span className="text-sm">
+                                            {dayjs(attempt.quizStartTime).fromNow()}
+                                        </span>
+                                    </div>
+                                    <div className="flex-1">
                                         <span className="font-bold text-xl">
                                             {attempt.correctedAnswers} / {quiz?.questions.length}
                                         </span>
-                                    </div>
-                                    <div>
-                                        <span className="text-sm">
-                                            {attempt.quizStartTime.toLocaleDateString()}
-                                        </span> 
                                     </div>
                                     <div>
                                         <Button
