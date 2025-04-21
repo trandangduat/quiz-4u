@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ArrowBigRight, ArrowRight, Clock, List, User } from "lucide-react";
+import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, List, MoveUpRight, SquareArrowUpRight, User } from "lucide-react";
 
 export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
-  const { quizId } = await params;
+    const { quizId } = await params;
 
     const quiz = await prisma.quiz.findUnique({
         where: {
@@ -26,6 +26,21 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
             </>
         )
     }
+
+    const attempts = await prisma.attempt.findMany({
+        where: {
+            quizId: quizId,
+            userId: session?.user?.id,
+            isSubmitted: true
+        },
+        select: {
+            id: true,
+            correctedAnswers: true,
+            quizStartTime: true,
+        }
+    });
+
+    console.log(attempts);
 
     return (
         <>
@@ -68,8 +83,38 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                         </DialogContent>
                     </Dialog>
                 </div>
-                <div className="flex justify-between p-6 bg-card dark:bg-secondary/25 rounded-md mt-6">
+                <div className="p-6 bg-card dark:bg-secondary/25 rounded-md mt-6">
                     <h2>Your previous attempts</h2>
+                    <div>
+                        {attempts.map(attempt => (
+                            <div 
+                                key={attempt.id}
+                                className="flex flex-col gap-2 p-4 bg-secondary/25 rounded-md mt-4"
+                            >
+                                <div className="flex flex-row w-full justify-between items-center">
+                                    <div>
+                                        <span className="font-bold text-xl">
+                                            {attempt.correctedAnswers} / {quiz?.questions.length}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="text-sm">
+                                            {attempt.quizStartTime.toLocaleDateString()}
+                                        </span> 
+                                    </div>
+                                    <div>
+                                        <Button
+                                            variant="link"
+                                            className="flex gap-2 items-center font-semibold p-4 cursor-pointer"
+                                        >
+                                            <ArrowUpRight size={16} />
+                                            Details
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </>
