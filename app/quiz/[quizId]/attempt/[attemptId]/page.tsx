@@ -32,16 +32,24 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
         }
     });
 
-    const attempt = await prisma.attempt.update({
-        where: {
-            id: attemptId,
-        },
-        data: {
-            isSubmitted: true,
-        }
-    });
+    let attempt = null;
 
-    console.log(attempt);
+    try {
+        attempt = await prisma.attempt.update({
+            where: {
+                id: attemptId,
+            },
+            data: {
+                isSubmitted: true,
+            }
+        });
+    } catch(e) {
+        return (
+            <>
+                <h1>No attempt found with ID {attemptId}</h1>
+            </>
+        );
+    }
 
     return (
         <>
