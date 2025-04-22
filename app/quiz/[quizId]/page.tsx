@@ -40,6 +40,9 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
             id: true,
             correctedAnswers: true,
             quizStartTime: true,
+        },
+        orderBy: {
+            quizStartTime: 'desc',
         }
     });
 
@@ -88,7 +91,7 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                 </div>
                 <div className="p-6 bg-card dark:bg-secondary/25 rounded-md mt-6">
                     <h2>Your previous attempts</h2>
-                    <div className="bg-secondary/15 px-4 rounded-md flex flex-col mt-4 divide-y-1 divide-secondary/50">
+                    <div className="bg-secondary/15 px-4 rounded-md flex flex-col m-4 divide-y-1 divide-secondary/25">
                         {attempts.map(attempt => (
                             <div
                                 key={attempt.id}
