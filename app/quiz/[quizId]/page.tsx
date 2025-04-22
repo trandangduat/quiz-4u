@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, Clock1, List, MoveUpRight, SquareArrowUpRight, Timer, User } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Link from "next/link";
 dayjs.extend(relativeTime);
 
 export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
@@ -113,9 +114,12 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                                         <Button
                                             variant="link"
                                             className="flex gap-2 items-center font-semibold p-4 cursor-pointer"
+                                            asChild
                                         >
-                                            <ArrowUpRight size={16} />
-                                            Details
+                                            <Link href={`/quiz/${quizId}/attempt/${attempt.id}`}>
+                                                <ArrowUpRight size={16} />
+                                                Details
+                                            </Link>
                                         </Button>
                                     </div>
                                 </div>

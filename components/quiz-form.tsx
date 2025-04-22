@@ -3,9 +3,10 @@
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronLeft, ChevronRight, MessageCircleWarning, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, MessageCircleWarning, Send, X } from "lucide-react";
 import { useCurrentAttempt } from "@/components/providers/current-attempt";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 function RadioButton({ isChosen, isCorrect, isGraded }: { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
     return (
@@ -254,24 +255,6 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                         />
                     ))}
 
-                    <div className="flex gap-3">
-                        {!isSubmitted ? (
-                            <Button
-                                className="p-4"
-                                onClick={handleSubmitQuizAttempt}
-                                disabled={answeredQuestions === 0}
-                            >
-                                Submit Quiz
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="soft"
-                                className="p-4"
-                            >
-                                Go back to quiz section
-                            </Button>
-                        )}
-                    </div>
                 </div>
             </div>
 
@@ -320,20 +303,20 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                         <div className="flex items-center justify-center">
                             <div className="relative w-24 h-24 flex items-center justify-center">
                                 <svg className="w-full h-full" viewBox="0 0 36 36">
-                                    <circle 
-                                        cx="18" 
-                                        cy="18" 
+                                    <circle
+                                        cx="18"
+                                        cy="18"
                                         r="15.91549430918954"
                                         fill="transparent"
                                         stroke="#e6e6e6"
                                         strokeWidth="2"
                                         className="dark:stroke-secondary/50"
                                     />
-                                    
-                                    <circle 
-                                        cx="18" 
-                                        cy="18" 
-                                        r="15.91549430918954" 
+
+                                    <circle
+                                        cx="18"
+                                        cy="18"
+                                        r="15.91549430918954"
                                         fill="transparent"
                                         stroke="currentColor"
                                         strokeWidth="2"
@@ -341,8 +324,8 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                                         strokeDashoffset="25"
                                         className={cn(
                                             "transition-all duration-1000 ease-in-out",
-                                            score === 0 ? "text-red-500" : 
-                                            score < quiz?.questions.length / 2 ? "text-amber-500" : 
+                                            score === 0 ? "text-red-500" :
+                                            score < quiz?.questions.length / 2 ? "text-amber-500" :
                                             score === quiz?.questions.length ? "text-green-500" : "text-blue-500"
                                         )}
                                     />
@@ -364,6 +347,28 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                         <Clock />
                     </div>
                 )}
+                <div className="flex items-center justify-center mt-4">
+                    {!isSubmitted ? (
+                        <Button
+                            className="p-6 w-full font-bold text-md cursor-pointer"
+                            onClick={handleSubmitQuizAttempt}
+                            disabled={answeredQuestions === 0}
+                        >
+                            <Send size={16} />
+                            Submit
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="soft"
+                            className="p-6 w-full"
+                        >
+                            <ArrowLeft size={16} />
+                            <Link href={`/quiz/${quiz.id}`}>
+                                Go back to quiz
+                            </Link>
+                        </Button>
+                    )}
+                </div>
             </div>
         </div>
     );
