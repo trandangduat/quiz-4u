@@ -13,6 +13,7 @@ const CurrentAttemptContext = createContext<{
   setQuizDuration: Dispatch<SetStateAction<number>>;
   attemptId: string | null;
   setAttemptId: Dispatch<SetStateAction<string | null>>;
+  reset: () => void;
 }>({
   quiz: null,
   setQuiz: () => {},
@@ -24,6 +25,7 @@ const CurrentAttemptContext = createContext<{
   setQuizDuration: () => {},
   attemptId: null,
   setAttemptId: () => {},
+  reset: () => {},
 });
 
 export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) => {
@@ -32,6 +34,13 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
   const [userChoices, setUserChoices] = useState<Record<string, number>>({});
   const [startTimeUTC, setStartTimeUTC] = useState<number>(-1);
   const [quizDuration, setQuizDuration] = useState<number>(-1);
+  const reset = () => {
+    setQuiz(null);
+    setStartTimeUTC(-1);
+    setQuizDuration(-1);
+    setUserChoices({});
+    setAttemptId(null);
+  };
 
   useEffect(() => {
     if (attemptId) {
@@ -57,12 +66,12 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
   }, [])
 
   useEffect(() => {
-    if (!quiz || startTimeUTC < 0) {
+    if (!quiz || startTimeUTC < 0 || !attemptId) {
       return;
     }
 
     const updateAttempt = async() => {
-      console.log("update attempt ", attemptId);
+      console.log("updating attempt... ", attemptId);
 
       const result = await fetch("/api/attempt/update", {
         method: "POST",
@@ -75,33 +84,8 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
         })
       });
     }
-
-    const saveAttempt = async() => {
-      console.log("create attempt ", quiz?.id, quizDuration, startTimeUTC);
-
-      const result = await fetch("/api/attempt/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          quizId: quiz?.id,
-          quizDuration,
-          quizStartTime: new Date(startTimeUTC)
-        })
-      });
-
-      const attempt = await result.json();
-      setAttemptId(attempt.id);
-    }
-
-    if (!attemptId) {
-      saveAttempt();
-    } else {
-      updateAttempt()
-    }
-
-  }, [quiz, userChoices, startTimeUTC, quizDuration]);
+    updateAttempt()
+  }, [quiz, userChoices, startTimeUTC, quizDuration, attemptId]);
 
   return (
     <CurrentAttemptContext.Provider value={{
@@ -109,7 +93,8 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
       userChoices, setUserChoices,
       startTimeUTC, setStartTimeUTC,
       quizDuration, setQuizDuration,
-      attemptId, setAttemptId
+      attemptId, setAttemptId,
+      reset
     }}>
       {children}
     </CurrentAttemptContext.Provider>

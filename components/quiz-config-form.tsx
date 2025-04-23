@@ -5,6 +5,7 @@ import { Button } from "./ui/button"
 import { use, useState } from "react";
 import { useCurrentAttempt } from "./providers/current-attempt";
 import { useRouter } from "next/navigation";
+import { Attempt } from "@prisma/client";
 
 export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
   {
@@ -16,22 +17,44 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
   const [enableTimeLimit, setEnableTimeLimit] = useState<boolean>(false);
   const [timeLimit, setTimeLimit] = useState<number>(0); // in minutes
   const [loading, setLoading] = useState<boolean>(false);
-
-  const currentAttempt = useCurrentAttempt();
+  const {
+    setAttemptId,
+    setQuiz,
+    setUserChoices,
+    setStartTimeUTC,
+    setQuizDuration
+  } = useCurrentAttempt();
   const router = useRouter();
 
-  const startQuiz = (e: React.FormEvent) => {
+  const startAttempt = async(e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    currentAttempt.setQuiz({
+    console.log("creating attempt... ", quizId, timeLimit * 60 * 1000);
+
+    const result = await fetch("/api/attempt/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        quizId: quizId,
+        quizDuration: timeLimit * 60 * 1000,
+        quizStartTime: new Date()
+      })
+    });
+
+    const attempt: Attempt = await result.json();
+
+    setAttemptId(attempt.id);
+    setQuiz({
       id: quizId,
       title: quizTitle,
       questionsCount: questionsCount,
     });
-    currentAttempt.setUserChoices({});
-    currentAttempt.setStartTimeUTC(-1);
-    currentAttempt.setQuizDuration(enableTimeLimit ? timeLimit * 60 * 1000 : -1);
+    setUserChoices({});
+    setStartTimeUTC(new Date(attempt.quizStartTime).getTime());
+    setQuizDuration(attempt.quizDuration);
 
     router.push(`/quiz/${quizId}/attempt`);
   };
@@ -71,7 +94,7 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
           <Button
             type="submit"
             className="font-semibold flex flex-row gap-2 items-center cursor-pointer"
-            onClick={startQuiz}
+            onClick={startAttempt}
             disabled={loading}
           >
             {loading ? <LoaderCircle size={16} className="animate-spin" /> : <ArrowRight size={16} /> }

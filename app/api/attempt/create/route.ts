@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
   } catch(e) {
     return NextResponse.json({
-      error: "Error creating quiz attempt"
+      error: "Error creating quiz attempt: " + e
     }, {
       status: 500
     });
