@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Montserrat } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Manrope, Montserrat } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -21,6 +21,16 @@ const monstserrat = Montserrat({
   subsets: ["latin"],
 });
 
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"]
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"]
+})
+
 export const metadata: Metadata = {
   title: "QUIZ4U",
   description: "LLM Quiz Generator",
@@ -34,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${monstserrat.className} ${geistMono.variable} antialiased`}
+        className={`${manrope.className} ${inter.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"

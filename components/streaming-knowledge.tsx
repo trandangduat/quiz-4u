@@ -1,14 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Geist } from "next/font/google";
 import { useContext, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 export default function StreamingKnowledge({
     extractingKnowledge,
@@ -33,9 +27,7 @@ export default function StreamingKnowledge({
     return (
         <div
             className={cn(
-                "bg-card dark:bg-secondary/30 rounded-md py-4 px-6 max-h-64 overflow-y-auto",
-                geistSans.className,
-                "custom-scrollbar"
+                "bg-card dark:bg-secondary/30 rounded-md py-4 px-6 max-h-64 overflow-y-auto custom-scrollbar"
             )}
             ref={streamingKnowledgeRef}
         >

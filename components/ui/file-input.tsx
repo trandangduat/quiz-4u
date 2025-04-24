@@ -1,18 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Upload } from "lucide-react";
-import { Geist_Mono, Playfair_Display } from "next/font/google";
 import React from "react";
-
-const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair-display",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 type FileInputProps = {
   className?: string;

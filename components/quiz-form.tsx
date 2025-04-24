@@ -50,7 +50,7 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
     return (
         <div
             className={cn(
-                "flex items-center gap-2 px-4 py-3 rounded-md border border-transparent",
+                "flex items-center gap-4 px-4 py-3 rounded-md border border-transparent",
                 !isGraded && !isChosen && "hover:bg-secondary/50 cursor-pointer transition-all hover:border-secondary/30",
                 isChosen && "bg-secondary/75 border-secondary/50",
                 isChosen && isGraded && !isCorrect && "bg-red-500/20 border-red-200 dark:border-red-900/50",
@@ -66,7 +66,7 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
                 isCorrect={isCorrect}
                 isGraded={isGraded}
             />
-            <p className="text-sm">{content}</p>
+            <p className="font-[var(--font-inter)] text-sm tracking-wide">{content}</p>
         </div>
     );
 }
