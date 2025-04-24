@@ -2,7 +2,6 @@
 
 import { ClockAlert } from "lucide-react";
 import { useCurrentAttempt } from "./providers/current-attempt";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useParams, usePathname } from "next/navigation";
@@ -12,30 +11,15 @@ export default function CurrentAttemptToast() {
         quiz,
         startTimeUTC,
         quizDuration,
-        userChoices
+        userChoices,
+        minutes,
+        seconds
     } = useCurrentAttempt();
-    const [minutes, setMinutes] = useState<number>(-1);
-    const [seconds, setSeconds] = useState<number>(-1);
     const answeredCount = Object.keys(userChoices).filter(key => userChoices[key] !== undefined).length;
     const pathname = usePathname();
 
-    useEffect(() => {
-        if (startTimeUTC < 0 || quizDuration < 0) {
-            return;
-        }
-        const setTime = () => {
-            const elapsed = Math.max(0, Date.now() - startTimeUTC);
-            const remaining = Math.max(0, quizDuration - elapsed);
-            setMinutes(Math.floor((remaining / 1000 / 60)));
-            setSeconds(Math.floor((remaining / 1000) % 60));
-        };
-        setTime();
-        const interval = setInterval(setTime, 500);
-
-        return () => clearInterval(interval)
-    }, [startTimeUTC, quizDuration]);
-
-    if (!quiz || !quiz.id || startTimeUTC < 0 || pathname === `/quiz/${quiz.id}/attempt`) {
+    if (!quiz || !quiz.id || startTimeUTC < 0 || minutes < 0 || seconds < 0 ||
+         pathname === `/quiz/${quiz.id}/attempt`) {
         return null;
     }
 

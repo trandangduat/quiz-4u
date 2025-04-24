@@ -151,30 +151,7 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
 }
 
 function Clock() {
-    const { startTimeUTC, setStartTimeUTC, quizDuration } = useCurrentAttempt();
-    const [minutes, setMinutes] = useState<number>(-1);
-    const [seconds, setSeconds] = useState<number>(-1);
-
-    useEffect(() => {
-        // only update quiz start time when clock component is mounted
-        if (startTimeUTC < 0) {
-            setStartTimeUTC(Date.now());
-            return;
-        }
-        if (quizDuration < 0) {
-            return;
-        }
-        const setTime = () => {
-            const elapsed = Math.max(0, Date.now() - startTimeUTC);
-            const remaining = Math.max(0, quizDuration - elapsed);
-            setMinutes(Math.floor((remaining / 1000 / 60)));
-            setSeconds(Math.floor((remaining / 1000) % 60));
-        };
-        setTime();
-        const interval = setInterval(setTime, 500);
-
-        return () => clearInterval(interval)
-    }, [startTimeUTC, quizDuration]);
+    const { minutes, seconds } = useCurrentAttempt();
 
     return (
         <div className="flex items-center gap-2 justify-center">
@@ -216,17 +193,9 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
         }
     }
 
-    const resetCurrentAttempt = () => {
-        currentAttempt.setQuiz(null);
-        currentAttempt.setStartTimeUTC(-1);
-        currentAttempt.setQuizDuration(-1);
-        currentAttempt.setUserChoices({});
-        currentAttempt.setAttemptId(null);
-    };
-
     const handleSubmitQuizAttempt = () => {
-        resetCurrentAttempt();
         router.push(`${pathname}/${currentAttempt.attemptId}`);
+        currentAttempt.reset();
     };
 
     const scrollToQuestion = (questionId: string) => {
@@ -267,8 +236,6 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                             const isAnswered = userChoices[Q.id] !== undefined;
                             const isCorrect = answers[Q.id] !== undefined && answers[Q.id].index === userChoices[Q.id];
                             const isIncorrect = answers[Q.id] !== undefined && answers[Q.id].index !== userChoices[Q.id];
-
-                            console.log(index + 1, isAnswered, isCorrect, isIncorrect, answers[Q.id])
 
                             return (
                                 <button

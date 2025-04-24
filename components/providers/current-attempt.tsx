@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
 
 const CurrentAttemptContext = createContext<{
@@ -13,6 +14,8 @@ const CurrentAttemptContext = createContext<{
   setQuizDuration: Dispatch<SetStateAction<number>>;
   attemptId: string | null;
   setAttemptId: Dispatch<SetStateAction<string | null>>;
+  minutes: number;
+  seconds: number;
   reset: () => void;
 }>({
   quiz: null,
@@ -25,6 +28,8 @@ const CurrentAttemptContext = createContext<{
   setQuizDuration: () => {},
   attemptId: null,
   setAttemptId: () => {},
+  minutes: -1,
+  seconds: -1,
   reset: () => {},
 });
 
@@ -34,13 +39,38 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
   const [userChoices, setUserChoices] = useState<Record<string, number>>({});
   const [startTimeUTC, setStartTimeUTC] = useState<number>(-1);
   const [quizDuration, setQuizDuration] = useState<number>(-1);
+  const [minutes, setMinutes] = useState<number>(-1);
+  const [seconds, setSeconds] = useState<number>(-1);
   const reset = () => {
     setQuiz(null);
     setStartTimeUTC(-1);
     setQuizDuration(-1);
     setUserChoices({});
     setAttemptId(null);
+    setMinutes(-1);
+    setSeconds(-1);
   };
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!attemptId || quizDuration < 0) {
+      return;
+    }
+    const setTime = () => {
+      const elapsed = Math.max(0, Date.now() - startTimeUTC);
+      const remaining = Math.max(0, quizDuration - elapsed);
+      if (remaining <= 0) {
+        router.push(`/quiz/${quiz?.id}/attempt/${attemptId}`);
+        reset();
+      }
+      setMinutes(Math.floor((remaining / 1000 / 60)));
+      setSeconds(Math.floor((remaining / 1000) % 60));
+    };
+    setTime();
+    const interval = setInterval(setTime, 500);
+
+    return () => clearInterval(interval)
+  }, [startTimeUTC, quizDuration, attemptId]);
 
   useEffect(() => {
     if (attemptId) {
@@ -94,6 +124,7 @@ export const CurrentAttemptProvider = ({ children } : { children: ReactNode }) =
       startTimeUTC, setStartTimeUTC,
       quizDuration, setQuizDuration,
       attemptId, setAttemptId,
+      minutes, seconds,
       reset
     }}>
       {children}
