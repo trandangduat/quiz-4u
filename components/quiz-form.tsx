@@ -50,11 +50,11 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
     return (
         <div
             className={cn(
-                "flex items-center gap-4 px-4 py-3 rounded-md ",
-                !isGraded && !isChosen && "hover:bg-secondary/35 cursor-pointer transition-colors",
-                isChosen && "bg-secondary/75",
-                isChosen && isGraded && !isCorrect && "bg-red-500/20",
-                isGraded && isCorrect && "bg-green-300/30",
+                "flex items-center gap-2 px-4 py-3 rounded-md border border-transparent",
+                !isGraded && !isChosen && "hover:bg-secondary/50 cursor-pointer transition-all hover:border-secondary/30",
+                isChosen && "bg-secondary/75 border-secondary/50",
+                isChosen && isGraded && !isCorrect && "bg-red-500/20 border-red-200 dark:border-red-900/50",
+                isGraded && isCorrect && "bg-green-300/30 border-green-200 dark:border-green-900/50",
             )}
             onClick={() => updateUserAnswer()}
             tabIndex={isGraded ? -1 : 0}
@@ -66,7 +66,7 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
                 isCorrect={isCorrect}
                 isGraded={isGraded}
             />
-            <p>{content}</p>
+            <p className="text-sm">{content}</p>
         </div>
     );
 }
@@ -86,11 +86,14 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
     return (
         <div
             id={`question-${Q.id}`}
-            className={cn("rounded-lg bg-white dark:bg-secondary/25")}
+            className={cn(
+                "rounded-lg bg-white dark:bg-secondary/25 border border-border/40 shadow-sm",
+                "transition-all duration-200 hover:shadow-md"
+            )}
         >
             <div className="flex items-center justify-between gap-4 p-4 border-b dark:border-secondary/50">
-                <div className="flex items-center gap-2">
-                    <span className="bg-primary/10 text-primary font-medium rounded-full w-7 h-7 flex items-center justify-center">
+                <div className="flex items-center gap-3">
+                    <span className="bg-primary/15 text-primary font-medium rounded-full w-8 h-8 flex items-center justify-center shadow-sm">
                         {questionNumber}
                     </span>
                     <p className="font-semibold">{Q.question}</p>
@@ -99,20 +102,22 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                     <div className="">
                         <Button
                             variant="soft"
-                            className="p-2 rounded-full hover:bg-secondary/50"
+                            className="p-2 rounded-full hover:bg-secondary/70 transition-colors"
                             onClick={() => setUserChoices((prevChoices) => ({ ...prevChoices, [Q.id]: undefined }))}
                             aria-label="Reset answer"
                             disabled={userChoice === undefined || answer !== undefined}
                         >
-                            <X size={16} />
-                            Reset answer
+                            <X size={16} className="mr-1" />
+                            <span className="text-sm">Reset</span>
                         </Button>
                     </div>
                 )}
                 {answer && (
                     <div className={cn(
-                        "flex items-center gap-2 mb-1 font-medium",
-                        answer.index === userChoice ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                        "flex items-center gap-2 mb-1 font-medium px-3 py-1 rounded-full",
+                        answer.index === userChoice
+                            ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
+                            : "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
                     )}>
                         {answer.index === userChoice ? (
                             <><Check size={18} />Correct</>
@@ -122,7 +127,7 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                     </div>
                 )}
             </div>
-            <div className="flex flex-col gap-1 p-4">
+            <div className="flex flex-col gap-2 p-5">
                 {Q.choices.map((choice: string, index: number) => (
                     <Choice
                         key={choice}
@@ -136,11 +141,11 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                 ))}
 
                 {answer && (
-                    <div className="mt-2 italic text-sm bg-primary/10 p-3 rounded-md flex items-center gap-4">
-                        <div className="bg-primary/8 rounded-md p-2">
-                            <MessageCircleWarning size={32} strokeWidth={1} />
+                    <div className="mt-2 italic text-sm bg-secondary/25 p-4 rounded-md flex items-center gap-4">
+                        <div className="bg-primary/10 rounded-full p-2 text-primary">
+                            <MessageCircleWarning size={28} strokeWidth={1.5} />
                         </div>
-                        <p className="">
+                        <p className="leading-relaxed">
                             {answer.explanation}
                         </p>
                     </div>
@@ -267,8 +272,8 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                 {isSubmitted && (
                     <div className="bg-card dark:bg-secondary/30 backdrop-blur-sm p-4 rounded-lg shadow-sm mt-4">
                         <h3 className="font-medium mb-3 text-sm">Score</h3>
-                        <div className="flex items-center justify-center">
-                            <div className="relative w-24 h-24 flex items-center justify-center">
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="relative w-32 h-32 flex items-center justify-center mb-2">
                                 <svg className="w-full h-full" viewBox="0 0 36 36">
                                     <circle
                                         cx="18"
@@ -289,21 +294,18 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                                         strokeWidth="2"
                                         strokeDasharray={`${(score / quiz?.questions.length) * 100} 100`}
                                         strokeDashoffset="25"
-                                        className={cn(
-                                            "transition-all duration-1000 ease-in-out",
-                                            score === 0 ? "text-red-500" :
-                                            score < quiz?.questions.length / 2 ? "text-amber-500" :
-                                            score === quiz?.questions.length ? "text-green-500" : "text-blue-500"
-                                        )}
+                                        className="text-primary transition-all duration-1000 ease-in-out"
                                     />
                                 </svg>
                                 {/* Score text */}
-                                <div className="absolute flex flex-col items-center justify-center">
-                                    <span className="text-2xl font-bold">{score}/{quiz?.questions.length}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        {Math.round((score / quiz?.questions.length) * 100)}%
-                                    </span>
+                                <div className="absolute flex items-center justify-center">
+                                    <span className="text-3xl font-bold">{score}/{quiz?.questions.length}</span>
                                 </div>
+                            </div>
+                            <div className="text-center">
+                                <span className="text-lg font-medium text-primary">
+                                    {Math.round((score / quiz?.questions.length) * 100)}%
+                                </span>
                             </div>
                         </div>
                     </div>
