@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, Clock1, History, List, LucideIcon, MoveUpRight, SquareArrowUpRight, SquareMousePointer, SquarePen, Timer, User } from "lucide-react";
+import { ArrowBigRight, ArrowRight, ArrowUpRight, BarChart, Clock, Clock1, History, List, LucideIcon, MoveUpRight, SquareArrowUpRight, SquareMousePointer, SquarePen, Timer, User } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
+import AttemptsScoreChart from "@/components/attempts-score-chart";
+import { Attempt } from "@prisma/client";
 dayjs.extend(relativeTime);
 
 export default async function Page({ params } : { params: Promise<{ quizId: string }> }) {
@@ -18,7 +20,8 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
         },
         include: {
             creator: true,
-            questions: true
+            questions: true,
+            knowledge: true
         }
     });
 
@@ -48,11 +51,23 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
     });
 
     const quizInfoStyle = "flex items-center gap-2 text-[13px] px-3 py-1 bg-secondary/70 rounded-full font-semibold text-primary-700 font-[var(--font-geist-mono)]";
+    const chartData: {
+        attemptId: number,
+        score: number,
+    }[] = [];
+
+    let count:number = 0;
+    for (let attempt of attempts) {
+        chartData.push({
+            attemptId: count++,
+            score: attempt.correctedAnswers
+        });
+    }
 
     return (
         <>
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex lg:flex-row flex-col gap-6">
-                <div className="flex flex-col justify-between p-6 bg-card dark:bg-secondary/25 rounded-md w-full basis-[45%]">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex lg:flex-row flex-col gap-6 items-start">
+                <div className="flex flex-col justify-between p-6 bg-card dark:bg-secondary/25 rounded-md w-full basis-[45%] gap-4 self-start">
                     <div className="flex flex-col gap-4">
                         <h1 className="text-3xl font-bold tracking-tight">{quiz?.title}</h1>
                         <div className="flex flex-row gap-3">
@@ -71,7 +86,7 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                         </div>
                     </div>
                     <div>
-                        <p>knowledge...</p>
+                        <AttemptsScoreChart chartData={chartData} />
                     </div>
                     <Dialog>
                         <DialogTrigger>
