@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, Clock1, List, MoveUpRight, SquareArrowUpRight, Timer, User } from "lucide-react";
+import { ArrowBigRight, ArrowRight, ArrowUpRight, Clock, Clock1, History, List, LucideIcon, MoveUpRight, SquareArrowUpRight, SquareMousePointer, SquarePen, Timer, User } from "lucide-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
@@ -47,34 +47,37 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
         }
     });
 
-    console.log(attempts);
+    const quizInfoStyle = "flex items-center gap-2 text-[13px] px-3 py-1 bg-secondary/70 rounded-full font-semibold text-primary-700 font-[var(--font-geist-mono)]";
 
     return (
         <>
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex justify-between items-center p-6 bg-card dark:bg-secondary/25 rounded-md">
-                    <div className="flex flex-col gap-2">
-                        <h1 className="text-2xl font-bold">{quiz?.title}</h1>
-                        <div className="flex flex-row gap-4">
-                            <span className="flex items-center gap-2 text-sm">
+            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex lg:flex-row flex-col gap-6">
+                <div className="flex flex-col justify-between p-6 bg-card dark:bg-secondary/25 rounded-md w-full basis-[45%]">
+                    <div className="flex flex-col gap-4">
+                        <h1 className="text-3xl font-bold tracking-tight">{quiz?.title}</h1>
+                        <div className="flex flex-row gap-3">
+                            <span className={quizInfoStyle}>
                                 <Clock size={16} />
                                 {quiz?.createdAt.toDateString()}
                             </span>
-                            <span className="flex items-center gap-2 text-sm">
+                            <span className={quizInfoStyle}>
                                 <User size={16} />
                                 {quiz?.creator?.name}
                             </span>
-                            <span className="flex items-center gap-2 text-sm">
+                            <span className={quizInfoStyle}>
                                 <List size={16} />
                                 {quiz?.questions.length} questions
                             </span>
                         </div>
                     </div>
+                    <div>
+                        <p>knowledge...</p>
+                    </div>
                     <Dialog>
                         <DialogTrigger>
-                            <Button className="flex gap-2 items-center font-semibold p-4 cursor-pointer">
-                                <ArrowRight size={16} />
-                                Start Quiz
+                            <Button className="font-semibold p-6 cursor-pointer text-base w-full">
+                                <SquareMousePointer size={16} />
+                                Start quiz
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
@@ -90,9 +93,12 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                         </DialogContent>
                     </Dialog>
                 </div>
-                <div className="p-6 bg-card dark:bg-secondary/25 rounded-md mt-6">
-                    <h2>Your previous attempts</h2>
-                    <div className="bg-secondary/15 px-4 rounded-md flex flex-col m-4 divide-y-1 divide-secondary/25">
+                <div className="p-6 bg-card dark:bg-secondary/25 rounded-md w-full flex-1">
+                    <h2 className="flex items-center gap-2 text-xl font-semibold">
+                        <History />
+                        Attempts History
+                    </h2>
+                    <div className="flex flex-col m-4 divide-y-1 divide-secondary/25">
                         {attempts.map(attempt => (
                             <div
                                 key={attempt.id}
@@ -105,12 +111,12 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                                             {dayjs(attempt.quizStartTime).fromNow()}
                                         </span>
                                     </div>
-                                    <div className="flex-1">
+                                    <div className="flex-1 text-center">
                                         <span className="font-bold text-xl">
                                             {attempt.correctedAnswers} / {quiz?.questions.length}
                                         </span>
                                     </div>
-                                    <div>
+                                    <div className="flex-1 flex justify-end">
                                         <Button
                                             variant="link"
                                             className="flex gap-2 items-center font-semibold p-4 cursor-pointer"

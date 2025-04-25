@@ -128,8 +128,7 @@ export const FileInputList = ({className, filesName = [], filesType = [], filesS
               <div className="flex flex-col min-w-0 flex-1">
                 <span
                   className={cn(
-                    "text-sm block font-semibold break-all line-clamp-2",
-                    geistMono.className
+                    "text-sm block font-semibold break-all line-clamp-2"
                   )}
                   title={name} // Show full name on hover
                 >
