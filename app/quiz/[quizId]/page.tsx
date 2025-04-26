@@ -73,7 +73,7 @@ export default async function Page({ params } : { params: Promise<{ quizId: stri
                         <div className="flex flex-row gap-3">
                             <span className={quizInfoStyle}>
                                 <Clock size={16} />
-                                {quiz?.createdAt.toDateString()}
+                                {dayjs(quiz?.createdAt.toDateString()).format("DD MMM, YYYY")}
                             </span>
                             <span className={quizInfoStyle}>
                                 <User size={16} />

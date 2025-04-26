@@ -60,7 +60,7 @@ export const DialogContent = ({ children, className }: DialogContentProps) => {
       }}
     >
       <div className={cn(
-        "bg-card dark:bg-secondary/25 backdrop-blur-xl w-full max-w-md rounded-md p-6 flex flex-col gap-6 transition-all duration-200",
+        "bg-card dark:bg-secondary-100 backdrop-blur-xl w-full max-w-md rounded-md p-6 flex flex-col gap-6 transition-all duration-200",
         open ? "scale-100 opacity-100" : "scale-95 opacity-0",
         className
       )}>
@@ -82,7 +82,7 @@ export const DialogHeader = ({ className, title, description }: DialogHeaderProp
   return (
     <div className={cn("flex flex-row justify-between items-center gap-4", className)}>
       <div className="flex flex-col gap-1">
-        {title && <span className="text-lg font-semibold">{title}</span>}
+        {title && <span className="text-lg font-bold">{title}</span>}
         {description && <span className="text-sm text-foreground/90">{description}</span>}
       </div>
       <div>

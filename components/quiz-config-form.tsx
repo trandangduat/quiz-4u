@@ -6,6 +6,8 @@ import { use, useState } from "react";
 import { useCurrentAttempt } from "./providers/current-attempt";
 import { useRouter } from "next/navigation";
 import { Attempt } from "@prisma/client";
+import { Slider } from "./ui/slider";
+import { Checkbox } from "./ui/checkbox";
 
 export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
   {
@@ -63,32 +65,39 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
     <form>
       <div className="flex flex-col gap-4">
           <div className="flex flex-row gap-2 items-center">
-              <input
-                type="checkbox" id="shuffle" className="cursor-pointer"
+              <Checkbox 
+                id="shuffle" 
                 checked={shuffle}
-                onChange={() => setShuffle(!shuffle)}
+                onCheckedChange={(checked: boolean) => setShuffle(checked)}
               />
               <label htmlFor="shuffle" className="text-sm cursor-pointer">Shuffle questions</label>
           </div>
           <div className="flex flex-row gap-2 items-center">
-              <input
-                type="checkbox" id="enable-timelimit" className="cursor-pointer"
+              <Checkbox 
+                id="enable-timelimit" 
                 checked={enableTimeLimit}
-                onChange={() => setEnableTimeLimit(!enableTimeLimit)}
+                onCheckedChange={(checked: boolean) => setEnableTimeLimit(checked)}
               />
               <label htmlFor="enable-timelimit" className="text-sm cursor-pointer">Set time limit</label>
           </div>
           <div>
-              <input
-                type="range" id="timelimit" min="0" max="60" step="1" className="w-full cursor-pointer"
-                value={timeLimit}
-                onChange={(e) => setTimeLimit(Number(e.target.value))}
+            <div className="w-full flex flex-row justify-center mb-5">
+              {enableTimeLimit ? ( 
+                <>
+                  <span className="text-5xl font-bold">{timeLimit}</span>
+                </>
+              ) : 
+                'oo'
+              }
+            </div>
+              <Slider 
+                value={[timeLimit]}
+                onValueChange={(value) => setTimeLimit(value[0])}
+                defaultValue={[0]} 
+                max={60} 
+                step={1}
               />
           </div>
-          {shuffle ? "Shuffle questions" : "Do not shuffle questions"}
-          <br></br>
-          {enableTimeLimit ? `Time limit: ${timeLimit} minutes` : "No time limit"}
-
       </div>
       <div className="flex justify-end mt-8">
           <Button

@@ -17,6 +17,8 @@
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.6.0",
     "@prisma/extension-accelerate": "^1.2.2",
+    "@radix-ui/react-checkbox": "^1.2.3",
+    "@radix-ui/react-slider": "^1.3.2",
     "@radix-ui/react-slot": "^1.1.2",
     "ai": "^4.1.56",
     "class-variance-authority": "^0.7.1",
