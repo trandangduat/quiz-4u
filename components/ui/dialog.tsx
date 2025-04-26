@@ -48,7 +48,7 @@ export const DialogContent = ({ children, className }: DialogContentProps) => {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-all duration-200",
+        "fixed inset-0 z-50 flex items-center justify-center bg-black/80 transition-all duration-200",
         open ? "opacity-100" : "opacity-0 pointer-events-none",
         className
       )}
@@ -60,8 +60,8 @@ export const DialogContent = ({ children, className }: DialogContentProps) => {
       }}
     >
       <div className={cn(
-        "bg-card dark:bg-secondary-100 backdrop-blur-xl w-full max-w-md rounded-md p-6 flex flex-col gap-6 transition-all duration-200",
-        open ? "scale-100 opacity-100" : "scale-95 opacity-0",
+        "bg-card dark:bg-secondary-100/60 border-1 backdrop-blur-xl w-full max-w-md rounded-md p-6 flex flex-col gap-4 transition-all duration-200",
+        open ? "scale-100 opacity-100" : "scale-90 opacity-0",
         className
       )}>
         {children}
@@ -80,13 +80,13 @@ export const DialogHeader = ({ className, title, description }: DialogHeaderProp
   const { setOpen } = useContext(DialogContext);
 
   return (
-    <div className={cn("flex flex-row justify-between items-center gap-4", className)}>
-      <div className="flex flex-col gap-1">
-        {title && <span className="text-lg font-bold">{title}</span>}
-        {description && <span className="text-sm text-foreground/90">{description}</span>}
+    <div className={cn("flex flex-row justify-between items-center gap-4 p-4 rounded-md bg-secondary/20", className)}>
+      <div className="space-y-1.5 flex flex-col">
+        {title && <span className="text-lg leading-none font-bold tracking-tight">{title}</span>}
+        {description && <span className="text-sm text-muted-foreground">{description}</span>}
       </div>
       <div>
-        <X size={16} className="cursor-pointer opacity-75 hover:opacity-100" onClick={() => setOpen(false)} />
+        <X size={16} className="cursor-pointer opacity-50 transition-all hover:opacity-100" onClick={() => setOpen(false)} />
       </div>
     </div>
   );
