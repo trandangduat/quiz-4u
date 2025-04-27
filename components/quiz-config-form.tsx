@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, LoaderCircle, Shuffle, Timer } from "lucide-react"
+import { ArrowRight, LoaderCircle, LogIn, Shuffle, Timer } from "lucide-react"
 import { Button } from "./ui/button"
 import { use, useState } from "react";
 import { useCurrentAttempt } from "./providers/current-attempt";
@@ -9,6 +9,7 @@ import { Attempt } from "@prisma/client";
 import { Slider } from "./ui/slider";
 import { Checkbox } from "./ui/checkbox";
 import { Switch } from "./ui/switch";
+import { cn } from "@/lib/utils";
 
 export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
   {
@@ -86,7 +87,7 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
               <div className="space-y-1.5">
                 <label htmlFor="enable-timelimit" className="cursor-pointer flex gap-2 items-center">
                   <Timer size={18} />
-                  Set time limit
+                  Time limit
                 </label>
                 <p className="text-muted-foreground text-xs">Leave this option off to stay in practice mode</p>
               </div>
@@ -98,7 +99,7 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
             </div>
             <div className="mt-5">
               <div className="w-full flex flex-row justify-center mb-5">
-                <div className="flex flex-col items-center">
+                <div className={cn("flex flex-col items-center", !enableTimeLimit && 'opacity-50')}>
                   <span className="text-4xl font-bold">{timeLimit}</span>
                   <span>minutes</span>
                 </div>
@@ -121,8 +122,8 @@ export default function QuizConfigForm({ quizId, quizTitle, questionsCount }:
             onClick={startAttempt}
             disabled={loading}
           >
-            {loading ? <LoaderCircle size={16} className="animate-spin" /> : <ArrowRight size={16} /> }
-              Let's go
+            {loading ? <LoaderCircle size={16} className="animate-spin" /> : <LogIn size={16} /> }
+            Let's go
           </Button>
       </div>
     </form>

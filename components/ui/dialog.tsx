@@ -60,7 +60,7 @@ export const DialogContent = ({ children, className }: DialogContentProps) => {
       }}
     >
       <div className={cn(
-        "bg-card dark:bg-secondary-100/60 border-1 backdrop-blur-xl w-full max-w-md rounded-md p-6 flex flex-col gap-4 transition-all duration-200",
+        "bg-card dark:bg-secondary-100/60 border-1 backdrop-blur-xl w-full max-w-lg rounded-md p-6 flex flex-col gap-4 transition-all duration-200",
         open ? "scale-100 opacity-100" : "scale-90 opacity-0",
         className
       )}>
