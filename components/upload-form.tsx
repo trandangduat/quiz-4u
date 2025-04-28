@@ -114,6 +114,7 @@ export default function UploadForm({ user } : { user: User }) {
         setExtractingKnowledge(s => `${s}${text}`);
         finalText += text;
       }
+      console.log(finalText)
       return finalText;
     } catch (e) {
       return `Something wrong happened while streaming result: ${e}`;
@@ -132,21 +133,21 @@ export default function UploadForm({ user } : { user: User }) {
   async function handleFilesSubmit(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
 
-    setCurrentStage(1);
-    await sleep(2000);
-    setCurrentStage(2);
-    await sleep(5000);
-    setCurrentStage(3);
-    await sleep(3000);
-    setCurrentStage(4);
-    setQuizInfo({
-      id: 'test-id',
-      title: 'Tín hiệu và hệ thống',
-      questionCount: 10,
-      createdAt: new Date().toISOString(),
-    });
-    setQuizLink('#');
-    return;
+    // setCurrentStage(1);
+    // await sleep(2000);
+    // setCurrentStage(2);
+    // await sleep(5000);
+    // setCurrentStage(3);
+    // await sleep(3000);
+    // setCurrentStage(4);
+    // setQuizInfo({
+    //   id: 'test-id',
+    //   title: 'Tín hiệu và hệ thống',
+    //   questionCount: 10,
+    //   createdAt: new Date().toISOString(),
+    // });
+    // setQuizLink('#');
+    // return;
 
     setCurrentStage(1);
     let presignedUrls = await getS3PresignedUrls();
@@ -159,19 +160,19 @@ export default function UploadForm({ user } : { user: User }) {
 
     setCurrentStage(2);
     console.time("extract knowledge");
-    let knowledge = await extractDocumentsKnowledge(filesName, filesType);
+    await extractDocumentsKnowledge(filesName, filesType);
     console.timeEnd("extract knowledge");
 
     setCurrentStage(3);
-    console.time("gen quiz");
-    const { quiz } = await generateQuiz(knowledge, 10);
-    console.log(quiz);
-    console.timeEnd("gen quiz");
-    const result = await createQuiz(quiz, user.id!, knowledge);
-    if (result !== "Error") {
-      setQuizInfo(result);
-      setQuizLink(`/quiz/${result.id}`);
-    }
+    // console.time("gen quiz");
+    // const { quiz } = await generateQuiz(knowledge, 10);
+    // console.log(quiz);
+    // console.timeEnd("gen quiz");
+    // const result = await createQuiz(quiz, user.id!, knowledge);
+    // if (result !== "Error") {
+    //   setQuizInfo(result);
+    //   setQuizLink(`/quiz/${result.id}`);
+    // }
 
     setCurrentStage(4);
   }
@@ -268,6 +269,8 @@ export default function UploadForm({ user } : { user: User }) {
 
 ## Quosque molire quantus degener rebello addidit urguet
 
+$$y(n) = x(n) * h(n) = \sum_{k=-\infinity}^{+\infinity} x(k)h(n-k)$$
+
 Lorem markdownum Eryx, est concepit, sine licet; ex admota si imagine. Buten
 animoque magnas luctus spatio crimine durus, me tardi et duro caeli, ad erat
 sanguine subit de! Aere vincere missi et rigescere coepit nec, ara gemma
@@ -299,29 +302,11 @@ relicta**. Illa defecta riget aut validos: sumit nunc!
 
 ## Latus generum
 
-Creatus stridentibus **dixit** est patris resedit moenibus potest colonus ignes
-[tacuit](http://www.amansmedia.net/) et internodia multaque exsul brevis vobis
-vixque: mutabit. Hamo nervo locis in quid lactis forte, et videri miratur suas
-ad erit haesit illis, id noviens Liternum. Partibus militiae semina; cuncta
-solet flores, castra scylla tantaeque deinde. Ipse infringat, iuste posti
-retinacula et, [quam](http://www.dictis.org/et-ex) omne sic.
-
-1. Ante fugit cum
-2. Levabas quaecumque ignis
-3. Mulcebant tempus vinclisque certos vicimus murra contingere
-4. Fecissent terras inania
-5. Eandem molli cingere Echidnaeae innuba dextra utque
-
-Esset sit sospes iubent. Hic hoc inexcusabile non austro salutifer riguisse
-undas est inque moveri, parvum hederae, in oris, quae quondamque. Annum mea
-poscit, insuetum, solvere mundus coma? Sacris hunc petit celebrare mora pervenit
-poenas oraque, et sit dammis antiquus et.
-
-Dominari sparsitque est; certans foedataque fera tendens noverca Pelagonaque
-latet vocat? Loquax ne erit dentibus vacuae, quo vos, conlapsus Ionium oculos
-Danae adulantum odoribus respicit accipe vox Capitolia.
+Limina at demptos, hoc est te fuso pectus bracchia saucius ac *est formosos*
+ignorant cupidusque *urbem* et simul, erat. Est domum, vicibus me crede Augusto
+te monstri segetes nisi Venus saevaeque concipit latrator remoliri **nuntia
+relicta**. Illa defecta riget aut validos: sumit nunc!
 `;
-            text += text;
             let arrayText = text.split(" ");
             let i = 0;
             let interval = setInterval(() => {
