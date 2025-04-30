@@ -160,19 +160,19 @@ export default function UploadForm({ user } : { user: User }) {
 
     setCurrentStage(2);
     console.time("extract knowledge");
-    await extractDocumentsKnowledge(filesName, filesType);
+    let knowledge = await extractDocumentsKnowledge(filesName, filesType);
     console.timeEnd("extract knowledge");
 
     setCurrentStage(3);
-    // console.time("gen quiz");
-    // const { quiz } = await generateQuiz(knowledge, 10);
-    // console.log(quiz);
-    // console.timeEnd("gen quiz");
-    // const result = await createQuiz(quiz, user.id!, knowledge);
-    // if (result !== "Error") {
-    //   setQuizInfo(result);
-    //   setQuizLink(`/quiz/${result.id}`);
-    // }
+    console.time("gen quiz");
+    const { quiz } = await generateQuiz(knowledge, 10);
+    console.log(quiz);
+    console.timeEnd("gen quiz");
+    const result = await createQuiz(quiz, user.id!, knowledge);
+    if (result !== "Error") {
+      setQuizInfo(result);
+      setQuizLink(`/quiz/${result.id}`);
+    }
 
     setCurrentStage(4);
   }

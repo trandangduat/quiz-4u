@@ -4,57 +4,78 @@ import { NextResponse } from "next/server";
 import { z } from 'zod';
 
 const QUIZ_GEN_PROMPT = `
-Generate multiple choice questions based on the educational content below. Requirements:
+You are an expert educational content assessor and exam writer.
+You must output a JSON object that conforms exactly to the following schema:
+{
+  quizTitle: string,
+  questions: [
+    {
+      question: string,
+      choices: string[],     // exactly 4 options
+      answer: number,        // index (0–3) of the correct option
+      explanation: string    // brief rationale for the correct answer
+    }
+  ]
+}
 
-1. Create ONLY multiple choice questions (MCQs) that test understanding of ALL key concepts, facts, and relationships in the material
-2. Each question must have exactly 4 options
-3. Ensure ONE and only one option is correct
-4. Make all incorrect options (distractors) plausible and relevant
-5. If the subject is heavily mathematical:
-   - Create MORE questions focused on calculations, equations, and problem-solving
-   - Include questions that test application of formulas and mathematical concepts
-   - Ensure distractors include common calculation errors
-   - Prioritize mathematical content over purely theoretical concepts
-6. For each question, include:
-   - A clear question text
-   - Four answer choices as separate strings
-   - The correct answer's index (0-3)
-   - A brief explanation of why the correct answer is right AND why other options are incorrect
-7. Distribute questions across ALL critical topics with emphasis on:
-   - High-value concepts likely to appear on exams
-   - Common misconceptions and frequently confused concepts
-   - Edge cases and exception scenarios that test deeper understanding
-8. Include questions that mimic real exam patterns:
-   - Use scenario-based questions that require applying knowledge to new situations
-   - Include questions with "All of the above" or "None of the above" options when appropriate
-   - Create questions that integrate multiple concepts to test comprehensive understanding
-9. Vary the cognitive demand level:
-   - 25% knowledge/recall questions
-   - 50% application/analysis questions
-   - 25% synthesis/evaluation questions
-10. Questions must be in the same language as the source material
-11. For content with visual elements (charts, diagrams, etc.), create questions that test interpretation of visual information
+Formatting rules:
+- Escape backslashes properly in LaTeX so the JSON is valid (e.g., \\\\frac{a}{b}).
+- Use \`$...$\` for inline math and \`$$...$$\` for display math.
+- Ensure output is valid JSON without comments or trailing commas.
+- Do NOT include explanations or notes outside the JSON object.
+
+Follow this structure strictly. Here’s a sample question for reference:
+
+Example:
+{
+  "quizTitle": "Basic Algebra and Fractions",
+  "questions": [
+    {
+      "question": "What is the result of simplifying $\\\\frac{2x}{4}$?",
+      "choices": [
+        "$\\\\frac{x}{2}$",
+        "$2x$",
+        "$\\\\frac{2}{x}$",
+        "$x + 2$"
+      ],
+      "answer": 0,
+      "explanation": "Dividing both numerator and denominator by 2 simplifies $\\\\frac{2x}{4}$ to $\\\\frac{x}{2}$."
+    }
+  ]
+}
+
+Now, generate a quiz based on the following content:
+- Title should reflect the topic clearly.
+- Generate exactly <numQuestions> questions.
+- Each question must have:
+  • Exactly four answer choices.
+  • One correct answer (with the correct zero-based index in \`answer\`).
+  • An explanation based on reasoning or correcting misconceptions.
 `;
 
 export async function POST(req: Request) {
-    const { knowledge, numQuestions } = await req.json();
+const { knowledge, numQuestions } = await req.json();
 
-    const quizSchema = z.object({
-        quizTitle: z.string(),
-        questions: z.array(z.object({
-            question: z.string(),
-            choices: z.array(z.string()),
-            answer: z.number(),
-            explanation: z.string(),
-        })),
-    });
+   const quizSchema = z.object({
+      quizTitle: z.string(),
+      questions: z.array(z.object({
+         question: z.string(),
+         choices: z.array(z.string()).length(4),
+         answer: z.number().int().min(0).max(3),
+         explanation: z.string(),
+      })),
+   });
 
-    const { object } = await generateObject({
-        model: openai("gpt-4o-mini"),
-        system: QUIZ_GEN_PROMPT,
-        schema: quizSchema,
-        prompt: `Generate a quiz of ${numQuestions} with below knowledge:\n ${knowledge}`,
-    });
+   const { object } = await generateObject({
+      model: openai("gpt-4o-mini"),
+      system: QUIZ_GEN_PROMPT,
+      schema: quizSchema,
+      prompt: `
+         Generate exactly ${numQuestions} questions with below educational content
+         ------------------------------------
+         ${knowledge}
+      `,
+   });
 
-    return NextResponse.json({ quiz: object });
+   return NextResponse.json({ quiz: object });
 }

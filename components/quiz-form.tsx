@@ -7,6 +7,9 @@ import { ArrowLeft, Check, ChevronLeft, ChevronRight, MessageCircleWarning, Send
 import { useCurrentAttempt } from "@/components/providers/current-attempt";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import remarkMath from "remark-math";
+import Markdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
 
 function RadioButton({ isChosen, isCorrect, isGraded }: { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
     return (
@@ -66,7 +69,11 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
                 isCorrect={isCorrect}
                 isGraded={isGraded}
             />
-            <p className="font-[var(--font-inter)] text-sm tracking-wide">{content}</p>
+            <span className="font-[var(--font-inter)] text-sm tracking-wide">
+                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    {content}
+                </Markdown>
+            </span>
         </div>
     );
 }
@@ -96,7 +103,11 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                     <span className="bg-primary/15 text-primary font-medium rounded-full w-8 h-8 flex items-center justify-center shadow-sm">
                         {questionNumber}
                     </span>
-                    <p className="font-semibold">{Q.question}</p>
+                    <span className="font-[var(--font-geist-mono)]">
+                        <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                            {Q.question}
+                        </Markdown>
+                    </span>
                 </div>
                 {!isSubmitted && (
                     <div className="">
@@ -145,9 +156,11 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                         <div className="bg-primary/10 rounded-full p-2 text-primary">
                             <MessageCircleWarning size={28} strokeWidth={1.5} />
                         </div>
-                        <p className="leading-relaxed">
-                            {answer.explanation}
-                        </p>
+                        <span className="leading-relaxed">
+                            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                {answer.explanation}
+                            </Markdown>
+                        </span>
                     </div>
                 )}
             </div>
