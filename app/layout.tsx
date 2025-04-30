@@ -5,31 +5,7 @@ import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CurrentAttemptProvider } from "@/components/providers/current-attempt";
 import CurrentAttemptToast from "@/components/current-attempt-toast";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const monstserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-});
-
-const manrope = Manrope({
-  variable: "--font-manrope",
-  subsets: ["latin"]
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"]
-})
+import { manrope } from "./font";
 
 export const metadata: Metadata = {
   title: "QUIZ4U",
@@ -44,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${manrope.className} ${inter.variable} ${geistMono.variable} antialiased`}
+        className={`${manrope.className} antialiased`}
       >
         <ThemeProvider
           attribute="class"

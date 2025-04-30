@@ -10,6 +10,7 @@ import Link from "next/link";
 import remarkMath from "remark-math";
 import Markdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
+import { notoSans } from "@/app/font";
 
 function RadioButton({ isChosen, isCorrect, isGraded }: { isChosen: boolean, isCorrect: boolean, isGraded: boolean }) {
     return (
@@ -69,7 +70,7 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
                 isCorrect={isCorrect}
                 isGraded={isGraded}
             />
-            <span className="font-[var(--font-inter)] text-sm tracking-wide">
+            <span className={cn("", notoSans.className)}>
                 <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                     {content}
                 </Markdown>
@@ -103,7 +104,7 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                     <span className="bg-primary/15 text-primary font-medium rounded-full w-8 h-8 flex items-center justify-center shadow-sm">
                         {questionNumber}
                     </span>
-                    <span className="font-[var(--font-geist-mono)]">
+                    <span className={notoSans.className}>
                         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                             {Q.question}
                         </Markdown>
@@ -152,11 +153,11 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                 ))}
 
                 {answer && (
-                    <div className="mt-2 italic text-sm bg-secondary/25 p-4 rounded-md flex items-center gap-4">
+                    <div className="mt-2 italic text-sm bg-secondary/25 p-3 rounded-md flex items-center gap-3">
                         <div className="bg-primary/10 rounded-full p-2 text-primary">
-                            <MessageCircleWarning size={28} strokeWidth={1.5} />
+                            <MessageCircleWarning size={24} strokeWidth={1.5} />
                         </div>
-                        <span className="leading-relaxed">
+                        <span className={cn("leading-relaxed", notoSans.className)}>
                             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                                 {answer.explanation}
                             </Markdown>
