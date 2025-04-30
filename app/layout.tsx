@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { CurrentAttemptProvider } from "@/components/providers/current-attempt";
 import CurrentAttemptToast from "@/components/current-attempt-toast";
 import { manrope } from "./font";
+import 'katex/dist/katex.min.css';
 
 export const metadata: Metadata = {
   title: "QUIZ4U",

@@ -5,7 +5,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
-import 'katex/dist/katex.min.css'
 import { notoSans } from "@/app/font";
 
 export default function StreamingKnowledge({
