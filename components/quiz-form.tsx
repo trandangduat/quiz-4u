@@ -307,7 +307,6 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                                         stroke="currentColor"
                                         strokeWidth="2"
                                         strokeDasharray={`${(score / quiz?.questions.length) * 100} 100`}
-                                        strokeDashoffset="25"
                                         className="text-primary transition-all duration-1000 ease-in-out"
                                     />
                                 </svg>
