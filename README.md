@@ -1,6 +1,7 @@
 # todo
 
 - [ ] improve LLM agents result
+- [ ] add optimistic loading, page transition, ...
 - [x] fix current attempt is mistaken as ongoing even though it was already submitted
 - [x] add try/catch for database operations in quiz attempt
 - [x] save current attempt into database when: starting quiz (ensure persistant even after refreshing page), every changes, user submits, out of time
