@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, MessageCircleWarning, Send, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, Info, MessageCircleWarning, Send, X } from "lucide-react";
 import { useCurrentAttempt } from "@/components/providers/current-attempt";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -18,8 +18,9 @@ function RadioButton({ isChosen, isCorrect, isGraded }: { isChosen: boolean, isC
             className={cn(
                 "w-4 h-4 rounded-full border-2 border-primary",
                 isChosen && "bg-primary",
+                isGraded && !isChosen && isCorrect && "border-green-700 dark:border-green-300",
                 isGraded && isChosen && isCorrect && "bg-green-700 border-green-700 dark:bg-green-300 dark:border-green-300",
-                isGraded && isChosen && !isCorrect && "bg-red-700 border-red-700 dark:bg-red-400 dark:border-red-400",
+                isGraded && isChosen && !isCorrect && "bg-red-600 border-red-600 dark:bg-red-400 dark:border-red-400",
             )}
         >
         </div>
@@ -54,11 +55,11 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
     return (
         <div
             className={cn(
-                "flex items-center gap-4 px-4 py-3 rounded-md border border-transparent",
+                "flex items-center gap-4 px-3 py-2 rounded-md",
                 !isGraded && !isChosen && "hover:bg-secondary/50 cursor-pointer transition-all hover:border-secondary/30",
                 isChosen && "bg-secondary/75 border-secondary/50",
-                isChosen && isGraded && !isCorrect && "bg-red-500/20 border-red-200 dark:border-red-900/50",
-                isGraded && isCorrect && "bg-green-300/30 border-green-200 dark:border-green-900/50",
+                isChosen && isGraded && !isCorrect && "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400",
+                isGraded && isCorrect && "bg-green-50 text-green-600 dark:text-green-400 dark:bg-green-900/20",
             )}
             onClick={() => updateUserAnswer()}
             tabIndex={isGraded ? -1 : 0}
@@ -70,7 +71,7 @@ function Choice({ content, index, questionId, isChosen, isCorrect, isGraded }:
                 isCorrect={isCorrect}
                 isGraded={isGraded}
             />
-            <span className={cn("", notoSans.className)}>
+            <span className={cn("text-sm", notoSans.className)}>
                 <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                     {content}
                 </Markdown>
@@ -99,9 +100,9 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                 "transition-all duration-200 hover:shadow-md"
             )}
         >
-            <div className="flex items-center justify-between gap-4 p-4 border-b dark:border-secondary/50">
-                <div className="flex items-center gap-3">
-                    <span className="bg-primary/15 text-primary font-medium rounded-full w-8 h-8 flex items-center justify-center shadow-sm">
+            <div className="flex items-center justify-between gap-4 py-3 px-4 border-b dark:border-secondary/50 text-sm">
+                <div className="flex items-center gap-2">
+                    <span className="bg-primary/15 text-primary font-bold rounded-md w-7 h-7 flex items-center justify-center">
                         {questionNumber}
                     </span>
                     <span className={notoSans.className}>
@@ -114,19 +115,19 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                     <div className="">
                         <Button
                             variant="soft"
-                            className="p-2 rounded-full hover:bg-secondary/70 transition-colors"
+                            className="hover:bg-secondary/70 transition-colors text-sm"
                             onClick={() => setUserChoices((prevChoices) => ({ ...prevChoices, [Q.id]: undefined }))}
                             aria-label="Reset answer"
                             disabled={userChoice === undefined || answer !== undefined}
                         >
-                            <X size={16} className="mr-1" />
-                            <span className="text-sm">Reset</span>
+                            <X size={16} />
+                            Reset
                         </Button>
                     </div>
                 )}
                 {answer && (
                     <div className={cn(
-                        "flex items-center gap-2 mb-1 font-medium px-3 py-1 rounded-full",
+                        "flex items-center gap-2 mb-1 font-medium px-3 py-1 rounded-md",
                         answer.index === userChoice
                             ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20"
                             : "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
@@ -139,7 +140,7 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                     </div>
                 )}
             </div>
-            <div className="flex flex-col gap-2 p-5">
+            <div className="flex flex-col gap-2 py-4 px-4">
                 {Q.choices.map((choice: string, index: number) => (
                     <Choice
                         key={choice}
@@ -153,15 +154,18 @@ function Question({ Q, answer, questionNumber, userChoice, isSubmitted }:
                 ))}
 
                 {answer && (
-                    <div className="mt-2 italic text-sm bg-secondary/25 p-3 rounded-md flex items-center gap-3">
-                        <div className="bg-primary/10 rounded-full p-2 text-primary">
-                            <MessageCircleWarning size={24} strokeWidth={1.5} />
+                    <div className="mt-6 text-sm bg-secondary/30 dark:bg-secondary/40 p-4 rounded-md flex flex-col gap-3 items-start">
+                        <div className="">
+                            <span className="px-3 py-1 bg-primary/10 rounded-md flex flex-row gap-2 items-center text-primary font-bold">
+                                <Info size={18}/>
+                                Explanation
+                            </span>
                         </div>
-                        <span className={cn("leading-relaxed", notoSans.className)}>
+                        <div className={cn("leading-relaxed italic px-1", notoSans.className)}>
                             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                                 {answer.explanation}
                             </Markdown>
-                        </span>
+                        </div>
                     </div>
                 )}
             </div>
@@ -231,7 +235,7 @@ export default function QuizForm({ quiz, attempt }: { quiz: any, attempt?: any }
                     <h1 className="text-3xl font-bold">{quiz.title}</h1>
                 </div>
 
-                <div className="flex flex-col gap-8">
+                <div className="flex flex-col gap-6">
                     {quiz?.questions.map((Q: any, index: number) => (
                         <Question
                             Q={Q}
