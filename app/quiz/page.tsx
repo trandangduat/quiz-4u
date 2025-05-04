@@ -48,7 +48,8 @@ async function Quizzes() {
               quizLink={`/quiz/${quiz.id}`}
               quizInfo={{
                 title: quiz.title,
-                questionCount: quiz.questions.length
+                questionCount: quiz.questions.length,
+                createdAt: quiz.createdAt
               }}
             />
           ))}
