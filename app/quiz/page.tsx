@@ -3,8 +3,11 @@ import { prisma } from "@/lib/prisma"
 import QuizCard from "@/components/quiz-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import QuizCardPanel from "@/components/quiz-card-panel";
 
-async function Quizzes() {
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export default async function Page() {
   const session = await auth();
   if (!session?.user) {
     return (
@@ -41,26 +44,10 @@ async function Quizzes() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr gap-6">
-          {createdQuizzes.map((quiz) => (
-            <QuizCard
-              key={quiz.id}
-              quizLink={`/quiz/${quiz.id}`}
-              quizInfo={{
-                title: quiz.title,
-                questionCount: quiz.questions.length,
-                createdAt: quiz.createdAt
-              }}
-            />
-          ))}
-        </div>
+        <QuizCardPanel 
+            createdQuizzes={createdQuizzes}
+        />
       )}
     </div>
   );
-}
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export default async function Page() {
-  return <Quizzes />;
 }
