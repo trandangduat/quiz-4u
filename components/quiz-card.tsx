@@ -1,4 +1,4 @@
-import dayjs from "dayjs"; import { ArrowUpRight, ChartScatter, ChevronsRight, ClipboardList, Clock, List, Loader, LoaderCircle, MoreVertical, Pencil, Pin, SquareChevronRight, Trash2, TrendingUp } from "lucide-react";
+import dayjs from "dayjs"; import { ArrowUpRight, ChartScatter,Clock, Layers2, List, LoaderCircle, Pin, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,10 @@ export default function QuizCard({ quizLink, quizInfo, chosenQuiz, setChosenQuiz
         id: string,
         title: string,
         questionCount: number,
-        createdAt?: Date
+        createdAt?: Date,
+        attemptsCount: number,
+        avgScore: number,
+        maxScore: number
     },
     chosenQuiz: string | null,
     setChosenQuiz: Dispatch<SetStateAction<string | null>>
@@ -22,14 +25,14 @@ export default function QuizCard({ quizLink, quizInfo, chosenQuiz, setChosenQuiz
     return (
         <div
             className={cn(
-                "group bg-card/50 dark:bg-secondary/25 rounded-md p-6 h-full relative transition-opacity duration-300",
-                chosenQuiz && chosenQuiz !== quizInfo.id && "opacity-50"
+                "group bg-card/50 dark:bg-secondary/25 rounded-md p-6 h-full relative transition-opacity duration-1000",
+                chosenQuiz && chosenQuiz !== quizInfo.id && "opacity-25 pointer-events-none"
             )}
         >
             <div className="relative h-full">
                 <div className="flex flex-col items-start gap-4 justify-between h-full">
                     <div className="w-full">
-                        <p className="font-extrabold text-xl tracking-tight w-full">
+                        <p className="font-bold text-xl tracking-tight w-full">
                             {quizInfo?.title || 'Unnamed'}
                         </p>
                     </div>
@@ -50,33 +53,40 @@ export default function QuizCard({ quizLink, quizInfo, chosenQuiz, setChosenQuiz
                         </div>
                         <div className={quizInfoStyle}>
                             <div className="flex items-center gap-2 text-muted-foreground">
+                                <Layers2 size={14} />
+                                <span>Attempts</span>
+                            </div>
+                            <span>{quizInfo.attemptsCount}</span>
+                        </div>
+                        <div className={quizInfoStyle}>
+                            <div className="flex items-center gap-2 text-muted-foreground">
                                 <ChartScatter size={14} />
                                 <span>Average score</span>
                             </div>
-                            <span>4.5</span>
+                            <span>{quizInfo.avgScore.toFixed(1)}</span>
                         </div>
                         <div className={quizInfoStyle}>
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <TrendingUp size={14} />
                                 <span>Maximum score</span>
                             </div>
-                            <span>10</span>
+                            <span>{quizInfo.maxScore}</span>
                         </div>
                     </div>
                     <div className="flex flex-row w-full text-base gap-4 font-semibold">
-                        <div className="p-3 rounded-md bg-secondary/25 flex items-center justify-center gap-2 w-full hover:bg-secondary/50 text-primary">
+                        <button className="p-3 rounded-md bg-secondary/25 flex items-center justify-center gap-2 cursor-pointer w-full hover:bg-secondary/75 text-primary">
                             <Pin size={16} />
                             <span>Pin</span>
-                        </div>
+                        </button>
                         <Link 
                             href={quizLink} 
                             className="w-full" 
-                            onMouseDown={() => { 
+                            onClick={() => { 
                                 setLoading(true);
                                 setChosenQuiz(quizInfo.id);
                             }}
                         >
-                            <button className="p-3 rounded-md bg-secondary/25 flex items-center justify-center gap-2 w-full hover:bg-secondary/50 text-primary">
+                            <button className="p-3 rounded-md bg-secondary/25 flex items-center justify-center gap-2 cursor-pointer w-full hover:bg-secondary/75 text-primary">
                                 {loading ? (<>
                                     <LoaderCircle size={16} className="animate-spin"/>
                                     <span>Redirecting...</span>

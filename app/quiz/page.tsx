@@ -1,11 +1,8 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma"
-import QuizCard from "@/components/quiz-card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import QuizCardPanel from "@/components/quiz-card-panel";
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export default async function Page() {
   const session = await auth();
@@ -26,7 +23,8 @@ export default async function Page() {
       creatorId: session?.user?.id
     },
     include: {
-      questions: true
+      questions: true,
+      attempts: true
     },
     orderBy: {
       createdAt: 'desc' // Sort by most recent first
@@ -44,8 +42,8 @@ export default async function Page() {
           </Link>
         </div>
       ) : (
-        <QuizCardPanel 
-            createdQuizzes={createdQuizzes}
+        <QuizCardPanel
+          createdQuizzes={createdQuizzes}
         />
       )}
     </div>
